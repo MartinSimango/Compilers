@@ -8,6 +8,7 @@ namespace Sudoku1
 {
     class Program
     {
+        static int known = 0;
         static void Main(string[] args)
         {
             if( args.Length !=1)
@@ -32,23 +33,98 @@ namespace Sudoku1
             // List<IntSet[,]> suggestBoard = new List<IntSet[,]>();
             // IntSet [,] generatedBoard = new IntSet[9,9]; 
 
-            Console.WriteLine(8 / 3);
             //read the already assinged board
             readBoard(assingedBoard, suggestedBoard,data, false);
+           
+            //read the solution board
+            readBoard(solutionBoard,suggestedBoard, data, true);
+          
+ 
+            updateSuggestedBoard(assingedBoard, suggestedBoard);
+
+            Console.WriteLine("Still Assignable\n");
+            printSuggestionBoard(suggestedBoard);
+
             Console.WriteLine("Already Assigned\n");
             printAssignedBoard(assingedBoard);
-            readBoard(solutionBoard,suggestedBoard, data, true);
-            Console.WriteLine("Solution Board\n");
-            printAssignedBoard(solutionBoard);
 
-          //  initializeSuggestedBoard(suggestBoard);
-            updateSuggestedBoard(assingedBoard,suggestedBoard);
+           //create the new suggestBoard
+            updateSuggestedBoard(assingedBoard, suggestedBoard);
+
+            Console.WriteLine();
+            Console.WriteLine(known + " squares known\n");
+            Console.WriteLine();
+
+            while (true)
+            {
+               
+                Console.WriteLine("Your move - row[0..8] col[0..8] value[1..9] (0 to give up)?");
+                int count = 0;
+                int [] inputs  = new int[3];
+                // get 3 numbers with a nice flow of input
+                while (count < 3)
+                {
+                    string[] listInput = Console.ReadLine().Trim().Split(' ');
+                    
+                    for (int i=0;i< listInput.Length && count < 3; i++)
+                    {
+                        if (listInput[i].Trim().Length > 0)
+                        {
+                            inputs[count++] = Convert.ToInt32(listInput[i]);
+                           
+                        }
+                    }
+                    
+                  
+                }
+                int rowInput = inputs[0];
+                int colInput = inputs[1];
+                int valueInput = inputs[2];
+                if(rowInput<0 || rowInput > 8 || colInput <0 || colInput > 8 || valueInput < 0 || valueInput>9)
+                {
+                    Console.WriteLine("******* Invalid");
+                    continue;
+                }
+                if(rowInput==0 && colInput ==0 && valueInput == 0)
+                {
+                    Console.WriteLine("You gave up :(");
+                    Console.WriteLine("\nHere is the solution: ");
+                    printAssignedBoard(solutionBoard);
+                    break; 
+                }
+
+
+                if (!getCurrentSet(suggestedBoard[rowInput, colInput]).Contains(valueInput))
+                {
+                    Console.WriteLine("******* Invalid");
+                    continue;
+                }
+                //The move is valid
+                known++;
+                assingedBoard[rowInput, colInput] = " "+valueInput;
+                suggestedBoard[rowInput, colInput] = null; //block has now been filled get rid of suggestions
+                updateSuggestedBoard(assingedBoard, suggestedBoard);
+
+
+                Console.WriteLine("Still Assignable\n");
+                printSuggestionBoard(suggestedBoard);
+
+                Console.WriteLine("Already Assigned\n");
+                printAssignedBoard(assingedBoard);
+
+                Console.WriteLine();
+                Console.WriteLine(known + " squares known\n");
+
+
+            }
             
-            printSuggestionBoard(suggestedBoard);
+
 
 
             Console.ReadKey();
         }
+       
+
         static void readBoard(string[,] board, int[,][,] suggestedBoard ,InFile data,bool solution)
         {
             int row=0, col = 0;
@@ -72,6 +148,7 @@ namespace Sudoku1
                     if (!solution)
                     {
                         suggestedBoard[row, col] = null;
+                        known++;
                     }
                 }
                 col++;
@@ -86,9 +163,9 @@ namespace Sudoku1
               skip next three lines to get to the next board (which is the solution board)*/
             if (!solution)
             {
-                Console.WriteLine(data.ReadLine());
-                Console.WriteLine(data.ReadLine());
-                Console.WriteLine(data.ReadLine());
+               data.ReadLine();
+               data.ReadLine();
+               data.ReadLine();
             }
         }
         static string getSingleBlock(int [,] block,int index) //converts a co-ordinate (row and col) into a string of suggested numbers
@@ -119,7 +196,7 @@ namespace Sudoku1
             Console.WriteLine("        0   1   2     3   4   5     6   7   8 \n"+
                               "     |=============+=============+=============|");
             int row = 0;
-            int col = 0;
+
             for (int i = 1; i <= 27; i++)
             {
                 num = "  ";
@@ -197,9 +274,13 @@ namespace Sudoku1
               return retSet;
             //return null;
         }
-        static IntSet getCurrentSet(int [,] block)
+        static IntSet getCurrentSet(int [,] block) //gets all the possible suggestions for a block
         {
             IntSet retSet = new IntSet();
+            if (block == null) //if the block is null it means it is already assinged and has no set of suggested values
+            {
+                return retSet;
+            }
             for(int i = 0; i < 3; i++)
             {
                 for(int j = 0; j < 3; j++)
@@ -214,8 +295,10 @@ namespace Sudoku1
             }
             return retSet;
         }
-        static void updateSuggestedBoard(string[,] assignedBoard, int[,][,] board)
+        static void updateSuggestedBoard(string[,] assignedBoard, int[,][,] suggestedBoard)
         {
+     
+
             for (int row = 0; row < 9; row++)
             {
                 for (int col = 0; col < 9; col++)
@@ -224,20 +307,27 @@ namespace Sudoku1
                     if (assignedBoard[row, col] != "..") //if a number is already assinged to that position
                     {
 
-                        board[row, col] = null;
+                    
+                            suggestedBoard[row, col] = null;
+                        
+                       
             
                     }
                     else //find the possible numbers
                     {
-                        IntSet currentSet = getCurrentSet(board[row, col]);
+                      
+                        IntSet currentSet = getCurrentSet(suggestedBoard[row, col]); //what's currently already suggested (now filter this list)
+     
                         IntSet rowSet = getRowSet(assignedBoard, row);
                         IntSet colSet = getColSet(assignedBoard, col);
 
                         IntSet blockSet = getBlockSet(assignedBoard,row,col);  //check the square the number is in
                         //print the block of the (row,col) point
                       //  Console.WriteLine("(" + row + " ," + col + ") =" + blockSet.ToString());
-
-                        IntSet allSet = rowSet.Union(colSet).Union(blockSet).SymDiff(currentSet);
+                      
+                        IntSet allSet = currentSet.Difference(rowSet.Union(colSet).Union(blockSet));
+                      
+                        //set the block to contain values corresponding to the SET
                         int[,] block = new int[3, 3];
                         for (int i = 0; i < 3; i++)
                         {
@@ -250,9 +340,7 @@ namespace Sudoku1
                                 }
                             }
                         }
-                        board[row, col] = block;
-
-
+                        suggestedBoard[row, col] = block;
                         
                     }
                     
@@ -275,10 +363,7 @@ namespace Sudoku1
 
             //print footer
             Console.WriteLine();
-            Console.WriteLine("       0   1   2   3   4   5   6   7   8 \n");
-
-
-        
+            Console.WriteLine("       0   1   2   3   4   5   6   7   8 \n");  
 
         }
     }
