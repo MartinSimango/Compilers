@@ -22,48 +22,57 @@ namespace Sudoku1
                 System.Environment.Exit(1);
             }
 
-            IntSet numberSet = new IntSet(1, 2, 3, 4, 5, 6, 7, 8, 9);
+           // IntSet numberSet = new IntSet(1, 2, 3, 4, 5, 6, 7, 8, 9);
+            //IntSet jg = new IntSet(2, 3,4);
+           // Console.WriteLine("Set:" + numberSet.SymDiff(jg).ToString());
             string [,] assingedBoard = new string[9,9]; //read in the assigned board
             string [,] solutionBoard = new string[9,9];
 
-            int [,][,] suggestBoard = new int[9,9][,];
-           // List<IntSet[,]> suggestBoard = new List<IntSet[,]>();
-           // IntSet [,] generatedBoard = new IntSet[9,9]; 
+            int [,][,] suggestedBoard = new int[9,9][,];
+            // List<IntSet[,]> suggestBoard = new List<IntSet[,]>();
+            // IntSet [,] generatedBoard = new IntSet[9,9]; 
 
-           
+            Console.WriteLine(8 / 3);
             //read the already assinged board
-            readBoard(assingedBoard, data, false);
+            readBoard(assingedBoard, suggestedBoard,data, false);
             Console.WriteLine("Already Assigned\n");
             printAssignedBoard(assingedBoard);
-            readBoard(solutionBoard, data, true);
+            readBoard(solutionBoard,suggestedBoard, data, true);
             Console.WriteLine("Solution Board\n");
             printAssignedBoard(solutionBoard);
 
-            initializeSuggestedBoard(suggestBoard);
-            updateSuggestedBoard(assingedBoard,suggestBoard);
+          //  initializeSuggestedBoard(suggestBoard);
+            updateSuggestedBoard(assingedBoard,suggestedBoard);
             
-            printSuggestionBoard(suggestBoard);
+            printSuggestionBoard(suggestedBoard);
 
 
             Console.ReadKey();
         }
-        static void readBoard(string[,] board,InFile data,bool solution)
+        static void readBoard(string[,] board, int[,][,] suggestedBoard ,InFile data,bool solution)
         {
             int row=0, col = 0;
+           
             while (row != 9 && !data.NoMoreData())
             {
                 int num = data.ReadInt();
-                if (!solution)
-                {
-                    
-                }
+               
                 if (num == 0)
                 {
                     board[row, col] = "..";
+                    if (!solution)
+                    {
+                        suggestedBoard[row, col] = new int[3, 3] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+                    }
+
                 }
                 else
                 {
                     board[row, col] = " " + num;
+                    if (!solution)
+                    {
+                        suggestedBoard[row, col] = null;
+                    }
                 }
                 col++;
                 if (col == 9)
@@ -85,6 +94,10 @@ namespace Sudoku1
         static string getSingleBlock(int [,] block,int index) //converts a co-ordinate (row and col) into a string of suggested numbers
         {
             string retVal = "";
+            if (block == null)
+            {
+                return "   ";
+            }
             for(int i = 0; i < 3; i++)
             {
                 if (block[index, i] == 0)
@@ -135,35 +148,112 @@ namespace Sudoku1
 
                 
         }
-        static void initializeSuggestedBoard(int[,][,] board)
+      
+        static IntSet getRowSet(string[,] assignedBoard,int row)
         {
+            IntSet retSet = new IntSet();
+            for(int col = 0; col < 9; col++)
+            {
+                if (assignedBoard[row,col] != "..")
+                {
+                    int num = Convert.ToInt32(assignedBoard[row, col].Trim());
+                    retSet.Incl(num);
+                }
+            }
+            return retSet;
+        }
+        static IntSet getColSet(string[,] assignedBoard,int col)
+        {
+            IntSet retSet = new IntSet();
             for (int row = 0; row < 9; row++)
             {
-                for (int col = 0; col < 9; col++)
+                if (assignedBoard[row, col] != "..") //if it's number
                 {
-                    board[row, col] = new int[3,3] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
-                   
+                    int num = Convert.ToInt32(assignedBoard[row, col].Trim());
+                    retSet.Incl(num);
                 }
-            }     
+            }
+            return retSet;
+        
         }
+        static IntSet getBlockSet(string[,] assignedBoard ,int row ,int col )
+        {
+              IntSet retSet= new IntSet();
 
+            int startRow = row - (row % 3);
+            int startCol = col - (col % 3);
+              for(int r=startRow; r < startRow+3; r++)
+            {
+                for(int c= startCol; c < startCol+3; c++)
+                {
+                    if (assignedBoard[r, c] != "..") //if it's number
+                    {
+                        int num = Convert.ToInt32(assignedBoard[r, c].Trim());
+                        retSet.Incl(num);
+                    }
+                }
+            }
+
+              return retSet;
+            //return null;
+        }
+        static IntSet getCurrentSet(int [,] block)
+        {
+            IntSet retSet = new IntSet();
+            for(int i = 0; i < 3; i++)
+            {
+                for(int j = 0; j < 3; j++)
+                {
+                    if (block[i, j] != 0) {
+                        retSet.Incl(block[i, j]);
+                      }
+                     
+                  
+                }
+            
+            }
+            return retSet;
+        }
         static void updateSuggestedBoard(string[,] assignedBoard, int[,][,] board)
         {
             for (int row = 0; row < 9; row++)
             {
                 for (int col = 0; col < 9; col++)
                 {
-                    if (assignedBoard[row, col] != "..")
+                    
+                    if (assignedBoard[row, col] != "..") //if a number is already assinged to that position
                     {
+
+                        board[row, col] = null;
+            
+                    }
+                    else //find the possible numbers
+                    {
+                        IntSet currentSet = getCurrentSet(board[row, col]);
+                        IntSet rowSet = getRowSet(assignedBoard, row);
+                        IntSet colSet = getColSet(assignedBoard, col);
+
+                        IntSet blockSet = getBlockSet(assignedBoard,row,col);  //check the square the number is in
+                        //print the block of the (row,col) point
+                      //  Console.WriteLine("(" + row + " ," + col + ") =" + blockSet.ToString());
+
+                        IntSet allSet = rowSet.Union(colSet).Union(blockSet).SymDiff(currentSet);
+                        int[,] block = new int[3, 3];
                         for (int i = 0; i < 3; i++)
                         {
-                            for (int j = 0; j < 3; j++)
+                            for(int j = 0; j < 3; j++)
                             {
-                                board[row, col][i, j] = 0;
+                                int numberToCheck= 3 * i + j + 1;
+                                if (allSet.Contains(numberToCheck))
+                                {
+                                    block[i, j] = numberToCheck;
+                                }
                             }
                         }
-             
+                        board[row, col] = block;
 
+
+                        
                     }
                     
                 }
