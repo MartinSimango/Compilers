@@ -1,4 +1,8 @@
-﻿using System;
+﻿//Matt Doherty, Louise Poole,Martin Simango
+//
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +12,9 @@ namespace Sudoku1
 {
     class Program
     {
-        static int known = 0;
-        static int predictions = 0;
-        static bool suggestedBoardEmpty = false;
+        static int known = 0; //number of sudoku tiles already assigned
+        static int predictions = 0; //number of predicted tiles
+        static bool suggestedBoardEmpty = false; //keep track of if the suggested board is empty
         static void Main(string[] args)
         {
             if( args.Length !=1)
@@ -26,10 +30,10 @@ namespace Sudoku1
             }
 
          
-            string [,] assignedBoard = new string[9,9]; 
-            string [,] solutionBoard = new string[9,9];
-            int[,] predictionBoard = new int[9, 9];
-            int [,][,] suggestedBoard = new int[9,9][,];
+            string [,] assignedBoard     =  new string [9,9]; 
+            string [,] solutionBoard     =  new string [9,9];
+            int    [,] predictionBoard   =  new int [9, 9];
+            int    [,][,] suggestedBoard =  new int [9,9][,];
            
 
             //read the already assinged board
@@ -37,17 +41,19 @@ namespace Sudoku1
            
             //read the solution board
             readBoard(solutionBoard,suggestedBoard, data, true);
-            updateSuggestedBoard(assignedBoard, suggestedBoard);
 
+            //update the suggestion board
+            updateSuggestedBoard(assignedBoard, suggestedBoard);
+            
+            // game loop
             do {
                 //create new suggestBoard
-             
-
                 Console.WriteLine("Still Assignable\n");
                 printSuggestionBoard(suggestedBoard);
 
                 Console.WriteLine("Already Assigned\n");
-                printAssignedBoard(assignedBoard, suggestedBoard, predictionBoard); //also calucaltes predictions
+                //print the assigned board and predict the next assigned board
+                printAndPredict(assignedBoard, suggestedBoard, predictionBoard); 
 
                 Console.WriteLine();
                 Console.WriteLine(known + " squares known with " + predictions + " predictions");
@@ -71,44 +77,40 @@ namespace Sudoku1
                     while (count < 3)
                     {
                         string[] listInput = Console.ReadLine().Trim().Split(' ');
-
                         for (int i = 0; i < listInput.Length && count < 3; i++)
                         {
                             if (listInput[i].Trim().Length > 0)
                             {
                                 inputs[count++] = Convert.ToInt32(listInput[i]);
-
                             }
                         }
-
-
                     }
 
                     int rowInput = inputs[0];
                     int colInput = inputs[1];
                     int valueInput = inputs[2];
+                    //check for input validation
                     if (rowInput < 0 || rowInput > 8 || colInput < 0 || colInput > 8 || valueInput < 0 || valueInput > 9)
                     {
                         Console.WriteLine("******* Invalid");
                         continue;
                     }
+                    //check if user gives up
                     if (rowInput == 0 && colInput == 0 && valueInput == 0)
                     {
                         Console.WriteLine("You gave up :(");
                         Console.WriteLine("\nHere is the solution: ");
-                        printAssignedBoard(solutionBoard, suggestedBoard, predictionBoard);
+                        printAndPredict(solutionBoard, suggestedBoard, predictionBoard);
                         System.Environment.Exit(0);
                     }
 
-
+                    //check if the suggested block has the value the user entered
                     if (!getCurrentSet(suggestedBoard[rowInput, colInput]).Contains(valueInput))
                     {
                         Console.WriteLine("******* Invalid");
                         continue;
                     }
                     // The move is valid
-
-
                     assignedBoard[rowInput, colInput] = " " + valueInput;
                     suggestedBoard[rowInput, colInput] = null; //block has now been filled get rid of suggestions
                     known++;
@@ -117,8 +119,13 @@ namespace Sudoku1
             
                 updateSuggestedBoard(assignedBoard, suggestedBoard);
             } while (known != 81 && !suggestedBoardEmpty);
-          
-         
+
+            //print out finished boards
+            Console.WriteLine("Still Assignable\n");
+            printSuggestionBoard(suggestedBoard);
+
+            Console.WriteLine("Already Assigned\n");
+            printAndPredict(assignedBoard, suggestedBoard, predictionBoard); //also calucaltes predictions
             if (known != 81) //if the games ends without 81 well know blocks then the game can't be finished
             {
                 Console.WriteLine("No more possible moves");
@@ -128,11 +135,7 @@ namespace Sudoku1
             }
             else
             {
-                Console.WriteLine("Still Assignable\n");
-                printSuggestionBoard(suggestedBoard);
-
-                Console.WriteLine("Already Assigned\n");
-                printAssignedBoard(assignedBoard, suggestedBoard, predictionBoard); //also calucaltes predictions
+            
                 Console.WriteLine("Well done game complete!");
             }
 
@@ -145,7 +148,7 @@ namespace Sudoku1
             {
                 for(int col = 0; col < 9; col++)
                 {
-                    if (predictionBoard[row, col] != 0)
+                    if (predictionBoard[row, col] != 0) //if this position has a prediction value
                     {
                         assingedBoard[row, col] = " " + predictionBoard[row, col];
                         known++;
@@ -170,7 +173,6 @@ namespace Sudoku1
                     {
                         suggestedBoard[row, col] = new int[3, 3] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
                     }
-
                 }
                 else
                 {
@@ -198,7 +200,9 @@ namespace Sudoku1
                data.ReadLine();
             }
         }
-        static string getSingleBlock(int [,] block,int index) //converts a co-ordinate (row and col) into a string of suggested numbers
+        static string getSingleBlock(int [,] block,int line) //converts a singles blocks' suggested values in 1 line into a string
+                                                             // e.g [1,0,3] gets converted into "1 3"
+                                                              
         {
             string retVal = "";
             if (block == null)
@@ -207,15 +211,14 @@ namespace Sudoku1
             }
             for(int i = 0; i < 3; i++)
             {
-                if (block[index, i] == 0)
+                if (block[line, i] == 0)
                 {
                     retVal += " ";
                 }
                 else
                 {
-                    retVal += block[index, i] + "";
-                }
-                
+                    retVal += block[line, i] + "";
+                }        
             }
             return retVal;
         }
@@ -250,12 +253,9 @@ namespace Sudoku1
             }
             //print footer
             Console.WriteLine ("     |=============+=============+=============|\n\n");
-
-            
-
-                
         }
       
+        //converts a row in the assingedBoard into a set
         static IntSet getRowSet(string[,] assignedBoard,int row)
         {
             IntSet retSet = new IntSet();
@@ -269,6 +269,7 @@ namespace Sudoku1
             }
             return retSet;
         }
+        //converts a row in the suggestedBoard into a set
         static IntSet getRowSetSuggested(int[,][,] suggestedBoard,int currentCol, int row)
         {
             IntSet retSet = new IntSet();
@@ -285,6 +286,7 @@ namespace Sudoku1
 
             return retSet;
         }
+        //converts a column in the assignedBoard into a set
         static IntSet getColSet(string[,] assignedBoard,int col)
         {
             IntSet retSet = new IntSet();
@@ -299,6 +301,7 @@ namespace Sudoku1
             return retSet;
         
         }
+        //converts a column in the suggestedBoard into a set
         static IntSet getColSetSuggested(int [,][,] suggestedBoard,int currentRow,int col)
         {
             IntSet retSet = new IntSet();
@@ -316,6 +319,7 @@ namespace Sudoku1
             return retSet;
 
         }
+        //converts a block in the assingedBoard into a set
         static IntSet getBlockSet(string[,] assignedBoard ,int row ,int col )
         {
             IntSet retSet= new IntSet();
@@ -334,10 +338,9 @@ namespace Sudoku1
                 }
             }
 
-              return retSet;
-           
+              return retSet;       
         }
-
+        //converts a block in the suggestedBoard into a set
         static IntSet getSuggestBlockSet(int[,][,] suggestedBoard,int row,int col)
         {
             IntSet retSet = new IntSet();
@@ -348,7 +351,8 @@ namespace Sudoku1
             {
                 for (int c = startCol; c < startCol + 3; c++)
                 {
-                    if(r==row && c == col)
+                    if(r==row && c == col) //exclude the current (row,col) because that is the block you'll be
+                                            //filtering out so don't add the suggested values to retSet
                     {
                         continue;
                     }
@@ -393,12 +397,10 @@ namespace Sudoku1
                     {     
                             suggestedBoard[row, col] = null;
                             emptySpots++; //an empty suggested block
-
-
                     }
                     else //find the possible numbers
                     {
-                      
+                     
                         IntSet currentSet = getCurrentSet(suggestedBoard[row, col]); //what's currently already suggested (now filter this list)
      
                         IntSet rowSet = getRowSet(assignedBoard, row);
@@ -407,7 +409,7 @@ namespace Sudoku1
                         IntSet blockSet = getBlockSet(assignedBoard,row,col);  //check the square the number is in
                         //print the block of the (row,col) point
                      
-                      
+                        // the final set of containing the suggested block
                         IntSet allSet = currentSet.Difference(rowSet.Union(colSet).Union(blockSet));
                         if (allSet.IsEmpty()) //an empty suggested block
                         {
@@ -420,14 +422,13 @@ namespace Sudoku1
                             for(int j = 0; j < 3; j++)
                             {
                                 int numberToCheck= 3 * i + j + 1;
-                                if (allSet.Contains(numberToCheck))
+                                if (allSet.Contains(numberToCheck))  //check if number in the suggested set
                                 {
                                     block[i, j] = numberToCheck;
                                 }
                             }
                         }
-                        suggestedBoard[row, col] = block;
-                        
+                        suggestedBoard[row, col] = block;        
                     }
                     
                 }
@@ -439,14 +440,10 @@ namespace Sudoku1
                 suggestedBoardEmpty = true;
             }
         }
-        static void printAssignedBoard(string [,] board,int[,][,] suggestedBoard,int [,] predictionBoard)
+        static void printAndPredict(string [,] board,int[,][,] suggestedBoard,int [,] predictionBoard)
         {
-
             //print header
-       
             Console.WriteLine("       0   1   2   3   4   5   6   7   8 \n");
-
-
             for (int i = 0; i < 9; i++) {
                 Console.Write("  {0}:  ",i);
                 for (int j = 0; j < 9; j++) {
@@ -457,7 +454,8 @@ namespace Sudoku1
                     IntSet rowSet = getRowSetSuggested(suggestedBoard, j,i);
                     IntSet colSet = getColSetSuggested(suggestedBoard, i,j);
                     IntSet blockSet = getSuggestBlockSet(suggestedBoard, i,j);
-
+                    //if 1 number is left in the set after currentSet is filtered(from either the row, column or block)
+                    //then that 1 number has to be the value of that blocks
                     if ((allSet = currentSet.Difference(rowSet)).Members() == 1)
                     {
                         int num = Convert.ToInt32(allSet.ToString()[1]+"");
