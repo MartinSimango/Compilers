@@ -40,20 +40,20 @@
   56   LDA      1
   58   LDV
   59   LDC      0
-  61   CGT
+  61   CGT						; while(i>0)
   62   BZE      84
   64   LDA      1
   66   LDA      1
   68   LDV
   69   LDC      1
   71   SUB
-  72   STO
+  72   STO						; i--
   73   LDA      0
   75   LDV
   76   LDA      1
   78   LDV
   79   LDXA
   80   LDV
-  81   PRNI
+  81   PRNI						; write(list[i])
   82   BRN      56
   84   HALT
