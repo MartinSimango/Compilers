@@ -1,90 +1,90 @@
-                          ; palin 
-   0   DSP      6	  ; // vars -- 0:n, 1:low, 2:high:, 3:item, 4:isPalindrone, 5:list
-   2   LDA 	5	 
+							; palin 
+   0   DSP      6	  		; // vars -- 0:n, 1:low, 2:high:, 3:item, 4:isPalindrone, 5:list
+   2   LDA 		5	 
    4   LDC      10 	 
    6   ANEW
-   7   STO		  ; int[] list = new int[10]
-   8   LDA 	0	
+   7   STO		  			; int[] list = new int[10]
+   8   LDA 		0	
   10   LDC      0
-  12   STO		  ; n = 0
-  13   LDA      0 	
-  15   INPI	          ; read(item)
+  12   STO		  			; n = 0
+  13   LDA      3
+  15   INPI	          		; read(item)
   16   LDA      3 
-  18   LDV       
-  19   LDC 	0 
-  21   CNE      	  ; while (item != 0)
-  22   BZE      49 	 
+  18   LDV
+  19   LDC 		0
+  21   CNE      	  		; while (item != 0)
+  22   BZE      49
   24   LDA      5      	 
   26   LDV
   27   LDA      0 
   29   LDV      
-  30   LDXA  	
+  30   LDXA 	
   31   LDA      3
   33   LDV
-  34   STO		  ; list[n] = item
-  35   LDA	0
-  37   LDA 	0
-  39   LDV      
+  34   STO		  			; list[n] = item
+  35   LDA		0
+  37   LDA 		0
+  39   LDV
   40   LDC      1 	
   42   ADD
-  43   STO   		  ; n = n + 1
-  44   LDA	3
-  46   INPI		  ; read(item)	
+  43   STO   		  		; n = n + 1
+  44   LDA		3
+  46   INPI		  			; read(item)	
   47   BRN      16
-  49   LDA      4	  
+  49   LDA      4
   51   LDC      1
-  53   STO		  ; isPalindrome = true 
+  53   STO		  			; isPalindrome = true 
   54   LDA      1    
   56   LDC      0
-  58   STO 		  ; low = 0 
+  58   STO 		  			; low = 0 
   59   LDA      2
-  61   LDA      0 
+  61   LDA      0
   63   LDV 
   64   LDC      1 
   66   SUB      
-  67   STO                ; high = n - 1
+  67   STO                	; high = n - 1
   68   LDA      1
   70   LDV
   71   LDA  	0
   73   LDV
   74   LDC      1 
-  76   SUB      
-  77   CLT               ; while (low < n - 1)
+  76   SUB
+  77   CLT               	; while (low < n - 1)
   78   BZE      124 	 
   80   LDA      5
   82   LDV
   83   LDA      1
   85   LDV
   86   LDXA
-  87   LDV 
+  87   LDV
   88   LDA      5
   90   LDV
   91   LDA      2
-  93   LDV      
+  93   LDV
   94   LDXA
   95   LDV 
-  96   CNE		; if (list[low] != list[high]) 
-  97   BZE      104     
-  99   LDA      4  
+  96   CNE					; if (list[low] != list[high]) 
+  97   BZE      104   
+  99   LDA      4
  101   LDC      0
- 103   STO  		; isPalindrome = false 
+ 103   STO  				; isPalindrome = false 
  104   LDA      1 
  106   LDA      1
- 108   LDV 
+ 108   LDV
  109   LDC      1 
  111   ADD
- 112   STO 	       ; low = low + 1  
- 113   LDA 	2
- 115   LDA 	2
+ 112   STO 	       			; low = low + 1  
+ 113   LDA 		2
+ 115   LDA 		2
  117   LDV      
  118   LDC      1 
  120   SUB 
- 121   STO             ; high = high - 1
- 122   BRN      68 
+ 121   STO             		; high = high - 1
+ 122   BRN      68
  124   LDA      4
  126   LDV      
  127   BZE      133
  129   PRNS     "Palindromic sequence"
- 131   BRN      135 
+ 131   BRN      135
  133   PRNS     "Non-palindromic sequence"
  135   HALT 
