@@ -41,7 +41,7 @@
   59   LDV
   60   LDC      0
   62   CGT						; while(i>0)
-  63   BZE      84
+  63   BZE      85
   65   LDA      1
   67   LDA      1
   69   LDV
