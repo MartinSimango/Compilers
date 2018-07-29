@@ -14,46 +14,46 @@
   18   LDV
   19   LDC      0
   21   CNE						; //n != 0
-  22   LDA      1
-  24   LDV
-  25   LDC      10
-  27   CLT						; //i < 10
-  28   AND						; while((n != 0) && (i < 10))
-  29   BZE      56
-  31   LDA      0
-  33   LDV
-  34   LDA      1
-  36   LDV
-  37   LDXA
-  38   LDA      2
-  40   LDV
-  41   STO						; list[i] = n
-  42   LDA      1
-  44   LDA      1
-  46   LDV
-  47   LDC      1
-  49   ADD
-  50   STO						; i++
-  51   LDA      2
-  53   INPI						; read(n)
-  54   BRN      16
-  56   LDA      1
-  58   LDV
-  59   LDC      0
-  61   CGT						; while(i>0)
-  62   BZE      84
-  64   LDA      1
-  66   LDA      1
-  68   LDV
-  69   LDC      1
-  71   SUB
-  72   STO						; i--
-  73   LDA      0
-  75   LDV
-  76   LDA      1
-  78   LDV
-  79   LDXA
-  80   LDV
-  81   PRNI						; write(list[i])
-  82   BRN      56
-  84   HALT
+  22   BZE 		57
+  24   LDA      1
+  26   LDV
+  27   LDC      10
+  29   CLT						; //i < 10
+  30   BZE      57				; while((n != 0) && (i < max))
+  32   LDA      0
+  34   LDV
+  35   LDA      1
+  37   LDV
+  38   LDXA
+  39   LDA      2
+  41   LDV
+  42   STO						; list[i] = n
+  43   LDA      1
+  45   LDA      1
+  47   LDV
+  48   LDC      1
+  50   ADD
+  51   STO						; i++
+  52   LDA      2
+  54   INPI						; read(n)
+  55   BRN      16
+  57   LDA      1
+  59   LDV
+  60   LDC      0
+  62   CGT						; while(i>0)
+  63   BZE      84
+  65   LDA      1
+  67   LDA      1
+  69   LDV
+  70   LDC      1
+  72   SUB
+  73   STO						; i--
+  74   LDA      0
+  76   LDV
+  77   LDA      1
+  79   LDV
+  80   LDXA
+  81   LDV
+  82   PRNI						; write(list[i])
+  83   BRN      57
+  85   HALT
