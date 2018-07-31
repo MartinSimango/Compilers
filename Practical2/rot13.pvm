@@ -1,0 +1,40 @@
+
+0 PRNS "Please enter string you want to encode ended by '.' \n"
+2 DSP 1 ; 0 - ch . Constanst '.' - 46 , 'a' - 97
+4 LDA 0
+6 INPC   ; read(ch)
+7 LDA 0
+9 LDA 0
+11 LDV   
+12 LOW ; lower(ch)
+13 STO ; ch = lower
+14 LDA 0
+15 LDV
+17 ISLET ;  if(isLetter(ch))
+18 BZE 38
+20 LDA 0
+22 LDA 0
+24 LDV
+25 LDC 97
+27 SUB
+28 LDC 13
+30 ADD
+31 LDC 26
+33 REM
+34 LDC 97
+36 ADD
+37 STO ; ch = (char) ('a' + (ch - 'a' + 13) %26)
+38 LDA 0
+40 LDV 
+41 PRNC
+42 LDC 46 ; 
+44 LDA 0
+46 LDV 
+47 CEQ ; '.' == ch
+48 BZE 4 ; they are not equal continue loop 
+50 LDA 0 
+52 INPC   ; capture enter
+53 HALT
+ 
+
+
