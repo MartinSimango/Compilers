@@ -4,61 +4,62 @@
    6   ANEW
    7   STO					; char [] str = new char [100]
    8   LDC_0
-   9   STL_1				; n = 0
+   9   STL_0				; n = 0
    10  LDA_3
    11  INPC					; read(ch)
    12  LDL_3
    13  LDC		46
-   15  CEQ
-   16  BZE		37			; while (ch != '.')
+   15  CNE
+   16  BZE		38			; while (ch != '.')
    18  LDL_3
    19  LDC 		32
    21  CGT
-   22  BZE      33			; if (ch > ' ')
+   22  BZE      34			; if (ch > ' ')
    24  LDL      5
    26  LDL_0
    27  LDXA
-   28  LDL_3
+   28  LDA_3
    29  LOW
-   30  STO					; str[n] = lower(ch)
-   31  LDA_0
-   32  INC					; n++
-   33  LDL_3
-   34  INPC					; read(ch)
-   35  BRN		12
-   37  LDC_1
-   38  STL 		4			; isPalindrome = true
-   40  LDC_0
-   41  STL_1				; low = 0
-   42  LDL_0
-   43  LDC_1
-   44  SUB
-   45  STL_2                ; high = n - 1
-   46  LDL_1
-   47  LDL_0
-   48  LDC_1
-   49  SUB
-   50  CLT
-   51  BZE      73	        ; while (low < n - 1)
-   53  LDL      5
-   55  LDL_1
-   56  LDXA
-   57  LDV
-   58  LDL      5
-   60  LDL_2
-   61  LDXA
-   62  LDV
-   63  CNE
-   64  BZE     69      	   	; if (str[low] != str[high])
-   66  LDC_0
-   67  STL     4           	; isPalindrome = false
-   69  LDA_1
-   70  INC   			   	; low++
-   71  LDA_2
-   72  DEC			   	    ; higher--
-   73  LDL     4
-   75  BZE     81        	; if (isPalindrome)
-   77  PRNS   "Palindromic string"
-   79  BRN     83
-   81  PRNS   "Non-palindromic string"
-   83  HALT 
+   30  LDL_3
+   31  STO					; str[n] = lower(ch)
+   32  LDA_0
+   33  INC					; n++
+   34  LDL_3
+   35  INPC					; read(ch)
+   36  BRN		12
+   38  LDC_1
+   39  STL 		4			; isPalindrome = true
+   41  LDC_0
+   42  STL_1				; low = 0
+   43  LDL_0
+   44  LDC_1
+   45  SUB
+   46  STL_2                ; high = n - 1
+   47  LDL_1
+   48  LDL_0
+   49  LDC_1
+   50  SUB
+   51  CLT
+   52  BZE      74	        ; while (low < n - 1)
+   54  LDL      5
+   56  LDL_1
+   57  LDXA
+   58  LDV
+   59  LDL      5
+   61  LDL_2
+   62  LDXA
+   63  LDV
+   64  CNE
+   65  BZE     70      	   	; if (str[low] != str[high])
+   67  LDC_0
+   68  STL     4           	; isPalindrome = false
+   70  LDA_1
+   71  INC   			   	; low++
+   72  LDA_2
+   73  DEC			   	    ; higher--
+   74  LDL     4
+   76  BZE     82        	; if (isPalindrome)
+   78  PRNS   "Palindromic string"
+   80  BRN     84
+   82  PRNS   "Non-palindromic string"
+   84  HALT 
