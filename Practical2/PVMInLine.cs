@@ -529,19 +529,19 @@ namespace Assem {
 			mem[--cpu.sp] = cpu.fp - 1 - 3;
 			break;
 		  case PVM.ldl:           // push local value
-			mem[--cpu.sp] = mem[mem[cpu.fp - 1 - mem[cpu.pc++]]];
+			mem[--cpu.sp] = mem[cpu.fp - 1 - mem[cpu.pc++]];
 			break;
 		  case PVM.ldl_0:         // push value of local variable 0
-			mem[--cpu.sp] = mem[mem[cpu.fp - 1 - 0]];
+			mem[--cpu.sp] = mem[cpu.fp - 1 - 0];
 			break;			
 		  case PVM.ldl_1:         // push value of local variable 1
-			mem[--cpu.sp] = mem[mem[cpu.fp - 1 - 1]];
+			mem[--cpu.sp] = mem[cpu.fp - 1 - 1];
 			break;	
           case PVM.ldl_2:         // push value of local variable 2
-			mem[--cpu.sp] = mem[mem[cpu.fp - 1 - 2]];
+			mem[--cpu.sp] = mem[cpu.fp - 1 - 2];
 			break;	
           case PVM.ldl_3:         // push value of local variable 3
-			mem[--cpu.sp] = mem[mem[cpu.fp - 1 - 3]];
+			mem[--cpu.sp] = mem[cpu.fp - 1 - 3];
 			break;	
           case PVM.stl:           // store local value
 			mem[cpu.fp - 1 - mem[cpu.pc++]] = mem[cpu.sp++];

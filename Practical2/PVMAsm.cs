@@ -122,8 +122,8 @@ namespace Assem {
             case PVM.dsp:
             case PVM.lda:
             case PVM.ldc:
-		//	case PVM.ldl:
-		//	case PVM.stl:
+			case PVM.ldl:
+			case PVM.stl:
               codeLen = (codeLen + 1) % PVM.memSize;
               if (ch == '\n')                        // no field could be found
                 Error("Missing address", codeLen);
