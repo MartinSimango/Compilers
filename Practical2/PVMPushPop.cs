@@ -644,11 +644,11 @@ namespace Assem {
 		  case PVM.cap:    
 		  break;// toUpperCase
           case PVM.low:  
-		  c = Char.ToLower((char)Pop());
-		  Push(c);
-		  break;		// toLowerCase
+			  tos = Pop(); //adr
+			  mem[tos] = Char.ToLower((char)mem[tos]);
+			  break;		// toLowerCase
           case PVM.islet:         // isLetter
-		  c = (char)Pop();
+		  c = (char)mem[Pop()];
 		  if((c>='A' && c<='Z') || (c>='a' && c<='z')){
 		  	Push(1);  
 		  }
@@ -658,13 +658,12 @@ namespace Assem {
 		  break;
           case PVM.inc:           // ++
 			tos = Pop();
-			tos += 1;
-			Push(tos);
+			mem[tos]+=1;
 		  break;
 		  case PVM.dec:   
 			tos = Pop();
-			tos -= 1;
-			Push(tos);
+			mem[tos]-=1;
+		
 		// --br
 		break;
           default:                // unrecognized opcode

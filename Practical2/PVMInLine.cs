@@ -576,15 +576,16 @@ namespace Assem {
 		  case PVM.cap:           // toUpperCase
 		  break;
           case PVM.low: 
-			mem[cpu.sp] = Char.ToLower((char)mem[cpu.sp]);
+			c = (char) mem[mem[cpu.sp]];
+			mem[mem[cpu.sp++]] = Char.ToLower(c);
 			break;// toLowerCase
           case PVM.islet:  
-		   c = (char) mem[cpu.sp++];
+		   c = (char) mem[mem[cpu.sp]];
 		   if((c>='A' && c<='Z') || (c>='a' && c<='z')){
-		  	mem[--cpu.sp]=1;  
+		  	mem[cpu.sp]=1;  
 			}
 		   else{
-			mem[--cpu.sp]=0;
+			mem[cpu.sp]=0;
 		   } 
 				// isLetter   
 		  break;
