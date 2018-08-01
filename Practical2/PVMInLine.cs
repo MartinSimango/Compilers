@@ -318,6 +318,8 @@ namespace Assem {
         case PVM.dsp:
         case PVM.lda:
         case PVM.ldc:
+		case PVM.ldl:
+		case PVM.stl:
         case PVM.prns:
           results.Write(mem[cpu.pc], 7); break;
         default: break;
@@ -391,15 +393,16 @@ namespace Assem {
             tos = mem[cpu.sp++]; mem[mem[cpu.sp++]] = tos;
             break;
           case PVM.ldxa:          // heap array indexing
-            tos = mem[cpu.sp++]; //adr
-            
-                     
-			if (mem[cpu.sp] == 0) ps = nullRef;
-            else if (mem[cpu.sp] < heapBase || mem[cpu.sp] >= cpu.hp) ps = badMem;
-            else if (tos < 0 || tos >= mem[mem[cpu.sp]]) ps = badInd;
-			else
-			mem[cpu.sp] = mem[cpu.sp] + tos;
-            break;
+            tos = mem[cpu.sp++]; //index
+            int heapPtr = mem[cpu.sp] ;        //adr       
+			if (heapPtr == 0) ps = nullRef;
+            else if (heapPtr < heapBase || heapPtr >= cpu.hp) ps = badMem;
+            else if (tos < 0 || tos >= mem[heapPtr] ) ps = badInd;
+            else {
+				mem[cpu.sp]= mem[cpu.sp] + tos + 1 ; //replace top of stack with new address of array[index]
+				}	
+		  break;
+		
           case PVM.inpi:          // integer input
             mem[mem[cpu.sp++]] = data.ReadInt();
             break;
@@ -492,9 +495,14 @@ namespace Assem {
             break;
           case PVM.anew:          // heap array allocation
             int size = mem[cpu.sp];
-            mem[cpu.sp] = cpu.hp;
-            cpu.hp += size;
-            break;
+			if (size <= 0 || size + 1 > cpu.sp - cpu.hp - 2)
+              ps = badAll;
+            else {
+              mem[cpu.hp] = size;
+              mem[cpu.sp] = cpu.hp; //replace size with adr
+              cpu.hp += size + 1;
+            }
+			break;
           case PVM.halt:          // halt
             ps = finished;
             break;
@@ -581,12 +589,13 @@ namespace Assem {
 				// isLetter   
 		  break;
           case PVM.inc:           // ++
-			mem[cpu.sp] += 1;
+			mem[mem[cpu.sp++]] += 1;
 			break;
 		  case PVM.dec:           // --
-			mem[cpu.sp] -= 1;
+			mem[mem[cpu.sp++]] -= 1;
 			break;
-		  default:                // unrecognized opcode
+		  default:  
+			results.WriteLine(cpu.ir);	// unrecognized opcode
             ps = badOp;
             break;
         }
@@ -668,6 +677,8 @@ namespace Assem {
           case PVM.bze:
           case PVM.dsp:
           case PVM.lda:
+		  case PVM.ldl:
+		  case PVM.stl:
           case PVM.ldc:
             i = (i + 1) % memSize; codeFile.Write(mem[i]);
             break;
