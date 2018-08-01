@@ -1,0 +1,60 @@
+   0   DSP      6	  		; // vars -- 0:n, 1:low, 2:high, 3:ch, 4:isPalindrome, 5:str
+   2   LDA      5
+   4   LDC 		100
+   6   ANEW
+   7   STO
+   8   LDC_0
+   9   STL					; // n = 0
+   10  LDA_3
+   11  INPC					; read(n)
+   12  LDL_3
+   13  LDC		46
+   15  CEQ
+   16  BZE		35			; while (ch != '.')
+   18  LDL_3
+   19  LDC 		32
+   21  CGT
+   22  BZE      33			; if (ch > ' ')
+   24  LDL      5
+   26  LDL_0
+   27  LDXA
+   28  LDL_3
+   29  LOW
+   30  STO					; str[n] = lower(ch)
+   31  LDL_0
+   32  INC					; n++
+   33  LDL_3
+   34  INPC					; read(ch)
+   35  LDC_1
+   36  STL 		4			; isPalindrome = true
+   37  LDC_0
+   38  STL_1				; low = 0
+   39  LDL_0
+   40  LDC_1
+   41  SUB
+   42  STL_2                ; high = n - 1
+   43  LDL_1				
+   44  LDL_0
+   45  LDC_1
+   46  SUB
+   47  CLT
+   48  BZE      67	        ;  while (low < n - 1)
+   50  LDL      5
+   51  LDL_1
+   52  LDXA
+   53  LDL      5
+   55  LDL_2
+   56  LDXA
+   57  CNE
+   58  BZE     63      ; if (str[low] != str[high])
+   60  LDC_0
+   61  STL     4           ; isPalindrome = false
+   63  LDL_1
+   64  INC 			       ; low++   
+   65  LDL_2
+   66  DEC				   ; higher--
+   67  LDL    4
+   69  BZE    73        ; if (isPalindrome)
+   71  PRNS   "Palindromic string"
+   73  PRNS   "Non-palindromic string"
+   75  HALT 
