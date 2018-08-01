@@ -2,15 +2,15 @@
    2   LDA      5
    4   LDC 		100
    6   ANEW
-   7   STO
+   7   STO					; char [] str = new char [100]
    8   LDC_0
-   9   STL					; // n = 0
+   9   STL_1				; n = 0
    10  LDA_3
-   11  INPC					; read(n)
+   11  INPC					; read(ch)
    12  LDL_3
    13  LDC		46
    15  CEQ
-   16  BZE		35			; while (ch != '.')
+   16  BZE		37			; while (ch != '.')
    18  LDL_3
    19  LDC 		32
    21  CGT
@@ -25,36 +25,40 @@
    32  INC					; n++
    33  LDL_3
    34  INPC					; read(ch)
-   35  LDC_1
-   36  STL 		4			; isPalindrome = true
-   37  LDC_0
-   38  STL_1				; low = 0
-   39  LDL_0
-   40  LDC_1
-   41  SUB
-   42  STL_2                ; high = n - 1
-   43  LDL_1				
-   44  LDL_0
-   45  LDC_1
-   46  SUB
-   47  CLT
-   48  BZE      67	        ;  while (low < n - 1)
-   50  LDL      5
-   51  LDL_1
-   52  LDXA
+   35  BRN		12
+   37  LDC_1
+   38  STL 		4			; isPalindrome = true
+   40  LDC_0
+   41  STL_1				; low = 0
+   42  LDL_0
+   43  LDC_1
+   44  SUB
+   45  STL_2                ; high = n - 1
+   46  LDL_1
+   47  LDL_0
+   48  LDC_1
+   49  SUB
+   50  CLT
+   51  BZE      72	        ; while (low < n - 1)
    53  LDL      5
-   55  LDL_2
+   55  LDL_1
    56  LDXA
-   57  CNE
-   58  BZE     63      ; if (str[low] != str[high])
-   60  LDC_0
-   61  STL     4           ; isPalindrome = false
-   63  LDL_1
-   64  INC 			       ; low++   
-   65  LDL_2
-   66  DEC				   ; higher--
-   67  LDL    4
-   69  BZE    73        ; if (isPalindrome)
-   71  PRNS   "Palindromic string"
-   73  PRNS   "Non-palindromic string"
-   75  HALT 
+   57  LDV
+   58  LDL      5
+   59  LDL_2
+   60  LDXA
+   61  LDV
+   62  CNE
+   63  BZE     68      	   ; if (str[low] != str[high])
+   65  LDC_0
+   66  STL     4           ; isPalindrome = false
+   68  LDL_1
+   69  INC 			       ; low++   
+   70  LDL_2
+   71  DEC				   ; higher--
+   72  LDL     4
+   74  BZE     78        ; if (isPalindrome)
+   76  PRNS   "Palindromic string"
+   78  BRN     82
+   80  PRNS   "Non-palindromic string"
+   82  HALT 
