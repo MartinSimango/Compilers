@@ -548,16 +548,16 @@ namespace Assem {
 			break;
           case PVM.stlc:          // store local value
           case PVM.stl_0:         // pop to local variable 0
-			mem[cpu.fp - 1 - mem[0]] = mem[cpu.sp++];
+			mem[cpu.fp - 1 - 0] = mem[cpu.sp++];
 			break;
           case PVM.stl_1:         // pop to local variable 1
-			mem[cpu.fp - 1 - mem[1]] = mem[cpu.sp++];
+			mem[cpu.fp - 1 - 1] = mem[cpu.sp++];
 			break;
           case PVM.stl_2:         // pop to local variable 2
-			mem[cpu.fp - 1 - mem[2]] = mem[cpu.sp++];
+			mem[cpu.fp - 1 - 2] = mem[cpu.sp++];
 			break;
 		  case PVM.stl_3:         // pop to local variable 3
-          	mem[cpu.fp - 1 - mem[3]] = mem[cpu.sp++];
+          	mem[cpu.fp - 1 - 3] = mem[cpu.sp++];
 			break;
           case PVM.inpc: 
 		  mem[mem[cpu.sp++]] = data.ReadChar(); // character input
@@ -568,7 +568,7 @@ namespace Assem {
 		  case PVM.cap:           // toUpperCase
 		  break;
           case PVM.low: 
-		  mem[cpu.sp] = Char.ToLower((char)mem[cpu.sp]);
+			mem[cpu.sp] = Char.ToLower((char)mem[cpu.sp]);
 			break;// toLowerCase
           case PVM.islet:  
 		   c = (char) mem[cpu.sp++];
