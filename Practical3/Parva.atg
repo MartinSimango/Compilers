@@ -27,24 +27,38 @@
   PRODUCTIONS
     Parva             = "void" identifier "(" ")" Block .
     Block             = "{" { Statement } "}" .
+    WhilelessBlock    = "{" { Statement } "}" .
     Statement         =   Block | ";"
                         | ConstDeclarations | VarDeclarations
                         | Assignment | IfStatement | WhileStatement
                         | ReturnStatement | HaltStatement
-                        | ReadStatement | WriteStatement .
+                        | ReadStatement | WriteStatement 
+						| DoWhileStatement | "break" | "continue" 
+						| ForStatement .
+	WhilelessStatement =   WhilelessBlock | ";"
+                        | ConstDeclarations | VarDeclarations
+                        | Assignment | IfStatement
+                        | ReturnStatement | HaltStatement
+                        | ReadStatement | WriteStatement 
+						| DoWhileStatement | "break" | "continue" 
+						| ForStatement .
     ConstDeclarations = "const" OneConst { "," OneConst } ";" .
     OneConst          = identifier AssignOp Constant .
     Constant          =   number | charLit
                         | "true" | "false" | "null" .
+	
     VarDeclarations   = Type OneVar { "," OneVar } ";" .
     OneVar            = identifier [ "=" Expression ] .
-	MultiVar          = identifier { "," identifier } "=" Expression { "," Expression } .
+	
     Assignment        = Designator AssignOp Expression ";" .
+	ForAssignment     = Designator AssignOp Expression .
     Designator        = identifier [ "[" Expression "]" ] .
     IfStatement       = "if" "(" Condition ")" Statement { ElseIfExtend } [ ElseExtend ] .
 	ElseExtend        = "else" Statement .
 	ElseIfExtend      = "elsif" "(" Condition ")" Statement .
     WhileStatement    = "while" "(" Condition ")" Statement .
+	DoWhileStatement  = "do" ("{" { Statement } "}" | { WhilelessStatement } ) "while" "(" Condition ")" ";" .
+	ForStatement      = "for" ( ForAssignment | Expression ) ( "to" | "downto" ) Expression Statement .
     ReturnStatement   = "return" ";" .
     HaltStatement     = "halt" ";" .
     ReadStatement     = "read" "(" ReadElement
