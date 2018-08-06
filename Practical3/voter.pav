@@ -1,0 +1,29 @@
+void main () {
+  const voting_Age = 18;
+  int age, eligible = 0, total = 0;
+  bool allEligible = true;
+  int[] voters = new int[100];
+  read(age);
+  while (age > 0) {
+    bool canVote = age > votingAge;
+    allEligible = allEligible && canVote;
+    if (canVote) {
+	  int hi, pi = 10, 5;
+	  hi += 5;
+      voters[eligible] = age;
+      eligible = eligible + 1;
+      total = total + voters[eligible - 1];
+    }
+	elsif ( age > 0 )
+	{
+	  int hi = 5;
+	}
+	else
+	{
+	int i = 1;
+	}
+    read(age);
+  }
+  write(eligible, " voters.  Average age is ", total / eligible, "\n");
+  if (allEligible) write("Everyone was above voting age");
+}

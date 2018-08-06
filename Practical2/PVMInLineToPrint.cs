@@ -89,146 +89,9 @@ namespace Assem {
       inc    =   60,
       dec    =   61,
 	  
+      nul    =   99;               // leave gap for future
+
 	  
-
-      nul    =   99;               // leave gap for future
-
-/* sorted 60 - 1
-
-    public const int
-      nop    =   60,
-      dsp    =   59,
-      ldc    =   58,
-      lda    =   57,
-      ldv    =   56,
-      sto    =   55,
-      ldxa   =   54,
-      inpi   =   53,
-      prni   =   52,
-      inpb   =   51,
-      prnb   =   50,
-      prns   =   49,
-      prnl   =   48,
-      neg    =   47,
-      add    =   46,
-      sub    =   45,
-      mul    =   44,
-      div    =   43,
-      rem    =   42,
-      not    =   41,
-      and    =   40,
-      or     =   39,
-      ceq    =   38,
-      cne    =   37,
-      clt    =   36,
-      cle    =   35,
-      cgt    =   34,
-      cge    =   33,
-      brn    =   32,
-      bze    =   31,
-      anew   =   30,
-      halt   =   29,
-      stk    =   28,
-      heap   =   27,
-      ldl    =   26,
-      stl    =   25,
-      lda_0  =   24,
-      lda_1  =   23,
-      lda_2  =   22,
-      lda_3  =   21,
-      ldl_0  =   20,
-      ldl_1  =   19,
-      ldl_2  =   18,
-      ldl_3  =   17,
-      stl_0  =   16,
-      stl_1  =   15,
-      stl_2  =   14,
-      stl_3  =   13,
-      ldc_0  =   12,
-      ldc_1  =   11,
-      ldc_2  =   10,
-      ldc_3  =    9,
-      inpc   =    8,
-      prnc   =    7,
-      stoc   =    6,
-      stlc   =    5,
-      low    =    4,
-      islet  =    3,
-      inc    =    2,
-      dec    =    1,
-
-      nul    =   99;               // leave gap for future
-
-*/
-
-/* sorted alphabetically
-
-    public const int
-      add    =    1,
-      and    =    2,
-      anew   =    3,
-      brn    =    4,
-      bze    =    5,
-      ceq    =    6,
-      cge    =    7,
-      cgt    =    8,
-      cle    =    9,
-      clt    =   10,
-      cne    =   11,
-      dec    =   12,
-      div    =   13,
-      dsp    =   14,
-      halt   =   15,
-      heap   =   16,
-      inc    =   17,
-      inpb   =   18,
-      inpc   =   19,
-      inpi   =   20,
-      islet  =   21,
-      lda    =   22,
-      lda_0  =   23,
-      lda_1  =   24,
-      lda_2  =   25,
-      lda_3  =   26,
-      ldc    =   27,
-      ldc_0  =   28,
-      ldc_1  =   29,
-      ldc_2  =   30,
-      ldc_3  =   31,
-      ldl    =   32,
-      ldl_0  =   33,
-      ldl_1  =   34,
-      ldl_2  =   35,
-      ldl_3  =   36,
-      ldv    =   37,
-      ldxa   =   38,
-      low    =   39,
-      mul    =   40,
-      neg    =   41,
-      nop    =   42,
-      not    =   43,
-      or     =   44,
-      prnb   =   45,
-      prnc   =   46,
-      prni   =   47,
-      prnl   =   48,
-      prns   =   49,
-      rem    =   50,
-      stk    =   51,
-      stl    =   52,
-      stl_0  =   53,
-      stl_1  =   54,
-      stl_2  =   55,
-      stl_3  =   56,
-      stlc   =   57,
-      sto    =   58,
-      stoc   =   59,
-      sub    =   60,
-
-      nul    =   99;               // leave gap for future
-
-*/
-
     public static string[] mnemonics = new string[PVM.nul + 1];
 
   // Memory
@@ -656,16 +519,6 @@ namespace Assem {
       if (fileName == null) return;
       OutFile codeFile = new OutFile(fileName);
 
-      /* ------------- The following may be useful for debugging the interpreter
-      i = 0;
-      while (i < codeLen) {
-        codeFile.Write(mem[i], 5);
-        if ((i + 1) % 15 == 0) codeFile.WriteLine();
-        i++;
-      }
-      codeFile.WriteLine();
-
-      ------------- */
 
       i = 0;
       codeFile.WriteLine("ASSEM\nBEGIN");
