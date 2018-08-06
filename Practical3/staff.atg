@@ -1,0 +1,20 @@
+COMPILER Staff  $CN
+
+CHARACTERS
+  uletters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".
+  lletters = "abcdefghijklmnopqrstuvwxyz".
+
+TOKENS
+  name  = uletters lletters{lletters}.
+  initial = uletters ".".
+
+IGNORE CHR(0) .. CHR(31)
+
+PRODUCTIONS
+  Staff       = {[title] Name [","Degree] "."} EOF .
+  Name        = ((initial{initial} name) | name(initial{initial}name |{name})). 
+  Degree	  = [bsc]["MSc,"|"MSc"] ["PhD"]  .
+  title       = "Mr" | "Mrs" | "Dr" | "Prof" | "Professor" | "Ms" .
+  bsc		  = "BSc," |"BSc" | "BSc(Hons)," | "BSc(Hons)" .
+  
+END Staff.
