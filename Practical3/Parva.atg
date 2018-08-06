@@ -34,22 +34,21 @@
                         | ReturnStatement | HaltStatement
                         | ReadStatement | WriteStatement 
 						| DoWhileStatement | "break" | "continue" 
-						| ForStatement .
+						| ForStatement | MultiAssign .
 	WhilelessStatement =   WhilelessBlock | ";"
                         | ConstDeclarations | VarDeclarations
                         | Assignment | IfStatement
                         | ReturnStatement | HaltStatement
                         | ReadStatement | WriteStatement 
 						| DoWhileStatement | "break" | "continue" 
-						| ForStatement .
+						| ForStatement | MultiAssign .
     ConstDeclarations = "const" OneConst { "," OneConst } ";" .
     OneConst          = identifier AssignOp Constant .
     Constant          =   number | charLit
                         | "true" | "false" | "null" .
-	
     VarDeclarations   = Type OneVar { "," OneVar } ";" .
     OneVar            = identifier [ "=" Expression ] .
-	
+	MultiAssign       = Designator { "," Designator } "=" Expression { "," Expression } .
     Assignment        = Designator AssignOp Expression ";" .
 	ForAssignment     = Designator AssignOp Expression .
     Designator        = identifier [ "[" Expression "]" ] .
