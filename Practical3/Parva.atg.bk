@@ -15,7 +15,7 @@
     printable  = ANY - control .
 
   TOKENS
-    identifier = letter [{ letter | digit | "_" } (letter | digit)] .
+    identifier = letter [ { letter | digit } | { letter | digit | "_" } ( letter | digit ) ] .
     number     = digit { digit } .
     stringLit  = '"' { stringCh | backslash printable } '"' .
     charLit    = "'" ( charCh   | backslash printable ) "'" .
@@ -27,39 +27,39 @@
   PRODUCTIONS
     Parva             = "void" identifier "(" ")" Block .
     Block             = "{" { Statement } "}" .
-	WhilelessBlock    = "{" { Statement } "}" .
+    WhilelessBlock    = "{" { Statement } "}" .
     Statement         =   Block | ";"
                         | ConstDeclarations | VarDeclarations
                         | Assignment | IfStatement | WhileStatement
-                        | ReturnStatement | HaltStatement | ContinueStatement
-                        | ReadStatement | WriteStatement | BreakStatement 
-						| DoWhileStatement | ForAssignment | ForStatement .
+                        | ReturnStatement | HaltStatement
+                        | ReadStatement | WriteStatement 
+						| DoWhileStatement | "break" | "continue" 
+						| ForStatement | MultiAssign .
 	WhilelessStatement =   WhilelessBlock | ";"
-					| ConstDeclarations | VarDeclarations
-					| Assignment | IfStatement
-					| ReturnStatement | HaltStatement
-					| ReadStatement | WriteStatement 
-					| DoWhileStatement | BreakStatement
-					| ContinueStatement | ForStatement.
+                        | ConstDeclarations | VarDeclarations
+                        | Assignment | IfStatement
+                        | ReturnStatement | HaltStatement
+                        | ReadStatement | WriteStatement 
+						| DoWhileStatement | "break" | "continue" 
+						| ForStatement | MultiAssign .
     ConstDeclarations = "const" OneConst { "," OneConst } ";" .
-    OneConst          = identifier "=" Constant .
+    OneConst          = identifier AssignOp Constant .
     Constant          =   number | charLit
                         | "true" | "false" | "null" .
     VarDeclarations   = Type OneVar { "," OneVar } ";" .
     OneVar            = identifier [ "=" Expression ] .
-    Assignment        = Designator {"," identifier} AssignOp Expression {"," Expression} ";" .
+	MultiAssign       = Designator { "," Designator } "=" Expression { "," Expression } .
+    Assignment        = Designator AssignOp Expression ";" .
+	ForAssignment     = Designator AssignOp Expression .
     Designator        = identifier [ "[" Expression "]" ] .
-    IfStatement       = "if" "(" Condition ")" Statement [{ElsifStatement}] [ElseStatement] .
-	ElsifStatement 	  = "elsif" "(" Condition ")" Statement .
-	ElseStatement     = "else" Statement .	
+    IfStatement       = "if" "(" Condition ")" Statement { ElseIfExtend } [ ElseExtend ] .
+	ElseExtend        = "else" Statement .
+	ElseIfExtend      = "elsif" "(" Condition ")" Statement .
     WhileStatement    = "while" "(" Condition ")" Statement .
 	DoWhileStatement  = "do" ("{" { Statement } "}" | { WhilelessStatement } ) "while" "(" Condition ")" ";" .
 	ForStatement      = "for" ( ForAssignment | Expression ) ( "to" | "downto" ) Expression Statement .
-	ForAssignment     = Designator AssignOp Expression .
     ReturnStatement   = "return" ";" .
     HaltStatement     = "halt" ";" .
-	BreakStatement 	  = "break" ";" .
-	ContinueStatement = "continue" ";" .
     ReadStatement     = "read" "(" ReadElement
                                    { "," ReadElement } ")" ";" .
     ReadElement       = stringLit | Designator .
@@ -75,7 +75,7 @@
                         | "!" Factor | "(" Expression ")" .
     Type              = BasicType [ "[]" ] .
     BasicType         = "int" | "bool" .
-	AssignOp 		  = "=" | "+=" | "-=" | "*=" "&=" .
+	AssignOp		  = "=" | "+=" | "-=" | "*=" | "/=" .
     AddOp             = "+" | "-" | "||" .
     MulOp             = "*" | "/" | "&&" | "%" .
     RelOp             = "==" | "!=" | "<" | "<=" | ">" | ">=" .
