@@ -1,0 +1,6 @@
+  void Main () {
+  // (not supposed to do anything useful!)
+    a += 5;
+    b &= true;
+    a, b = true, false, !a, a &&b;
+  } // Main

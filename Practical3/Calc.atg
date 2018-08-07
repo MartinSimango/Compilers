@@ -1,0 +1,23 @@
+COMPILER Calc  $CN
+/* Simple four function calculator
+   P.D. Terry, Rhodes University, 2017 */
+
+CHARACTERS
+  digit      = "0123456789" .
+  hexdigit   = digit + "ABCDEF" .
+
+TOKENS
+  decNumber  = digit { digit } ["." digit { digit }] .
+  hexNumber  = "$" hexdigit { hexdigit } ["." digit { digit }] .
+
+IGNORE CHR(0) .. CHR(31)
+
+PRODUCTIONS
+  Calc       = { Expression "=" } EOF .
+  Expression = ["+" | "-"] Term { "+" Term  |  "-" Term } .
+  Term       = Root { "*" Root |  "/" Root } .
+  Root 	 	 = Power { "sqrt(" Power ")" } | "sqrt(" Power ")" . 
+  Power  	 = (Paren { "^" Paren } | Paren) .
+  Paren 	 = Factor { "(" Expression ")" } | { "(" Expression ")" } .
+  Factor     = decNumber | hexNumber .
+END Calc.

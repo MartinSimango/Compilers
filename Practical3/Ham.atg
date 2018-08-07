@@ -1,0 +1,24 @@
+COMPILER Ham  $CN
+/* Simple four function calculator
+   P.D. Terry, Rhodes University, 2017 */
+
+CHARACTERS
+  uletter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
+  lletter = "abcdefghijklmnopqrstuvwxyz" .
+
+TOKENS
+  Initial = uletter "." .
+  name    = uletter lletter {lletter} .
+  
+IGNORE CHR(0) .. CHR(31)
+
+PRODUCTIONS
+  Ham       = { [Title] Name [ "," Degree ] "." } EOF .
+  Name 	 	= (name { name } | Initial {Initial} name | name Initial {Initial} name) .
+  Title 	= "Mr" | "Mrs" | "Ms" | "Prof" | "Dr" | "Professor" .
+  Degree    = [bsc]["MSc," | "MSc"] ["PhD"] .
+  bsc       = "BSc," | "BSc" | "BSc(Hons)," | "BSc(Hons)" .
+
+END Ham.
+
+  Name 	 	= ((Initial{Initial} name) | name(Initial{Initial}name | {name})) .
