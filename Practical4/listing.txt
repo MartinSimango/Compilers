@@ -1,0 +1,38 @@
+  Warning: Weather is deletable
+  LL1 warning in Radio: "advert" is the start of several alternatives
+  LL1 warning in TalkShow: "song" is the start & successor of a deletable structure
+  LL1 warning in TalkShow: "advert" is the start & successor of a deletable structure
+  LL1 warning in NewsBulletin: the contents of [...] or {...} must not be deletable
+  LL1 warning in NewsItem: "SACP" is the start & successor of a deletable structure
+  LL1 warning in NewsItem: "ANC" is the start of several alternatives
+
+   1 COMPILER Radio $TF
+   2 /* Describe a day's activity on our National Broadcaster
+   3    P.D. Terry, Rhodes University, 2017 */
+   4 
+   5 CHARACTERS
+   6   letter     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+   7                + "abcdefghijklmnopqrstuvwxyz" .
+   8   digit      = "0123456789" .
+   9 
+  10 TOKENS
+  11   identifier = letter { letter | digit } .
+  12   number     = digit { digit } .
+  13 
+  14 IGNORE CHR(0) .. CHR(31)
+  15 
+  16 PRODUCTIONS
+  17   Radio        =   { TalkShow | NewsBulletin | "song" | "advert" } EOF .
+  18   NewsBulletin =   "advert" NewsItem { NewsItem } [ Weather ] Filler .
+  19   NewsItem     =      "ANC" [ "SACP" ] | "protest" | [ "SACP" ] "ANC" | "zuma"
+  20                    | "Helen" "tweet" | Scandal | Accident .
+  21   TalkShow     =   "host" { listener "host" } [ Filler ] .
+  22   Accident     =   "collision" "claims" "another" number "lives" .
+  23   Scandal      =   { "GuptaLeak" } "corruption"  | "Hlaudi" .
+  24   Filler       =   "song" | "advert"  .
+  25   Weather      =   { "snow" | "rain" | "cloudy" | "windy" } .
+  26   listener     =   identifier .
+  27 END Radio.
+
+0 errors detected
+7 warnings detected

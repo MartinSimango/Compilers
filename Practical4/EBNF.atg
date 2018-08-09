@@ -1,0 +1,31 @@
+COMPILER EBNF $CN
+/* Recognize a set of EBNF productions
+   P.D. Terry, Rhodes University, 2007 */
+
+CHARACTERS
+  control  = CHR(0) .. CHR(31) .
+  letter   = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" .
+  lowline  = "_" .
+  digit    = "0123456789" .
+  noquote1 = ANY - "'" - control .
+  noquote2  = ANY - '"' - control .
+
+TOKENS
+  nonTerminal = letter { letter | lowline | digit } .
+  terminal    = "'" noquote1 { noquote1 } "'" | '"' noquote2 { noquote2 } '"' .
+
+COMMENTS FROM "(*" TO "*)"  NESTED
+
+IGNORE control
+
+PRODUCTIONS
+  EBNF       = { Production } EOF .
+  Production = nonTerminal "=" Expression SYNC "." .
+  Expression = Term { "|" Term } .
+  Term       = Factor { Factor } .
+  Factor     =   nonTerminal
+               | terminal
+               | "[" Expression "]"
+               | "(" Expression ")"
+               | "{" Expression "}" .
+END EBNF.

@@ -1,0 +1,5 @@
+Goal = { One } .
+One  = Two "plus" Four "." .
+Four = Five { "is" Five } .
+Five = Six { Six } .
+Six =  Two | Three | "(*" Four "*)" | '(' Four ')' .
