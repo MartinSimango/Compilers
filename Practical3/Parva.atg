@@ -1,4 +1,5 @@
-  COMPILER Parva $CN
+/*Martin Simango , Louise Poole , Matthew Doherty*/ 
+ COMPILER Parva $CN
   /* Parva level 1 grammar  - Coco/R for C# (EBNF)
      P.D. Terry, Rhodes University, 2003
      Grammar only */
@@ -27,36 +28,28 @@
   PRODUCTIONS
     Parva             = "void" identifier "(" ")" Block .
     Block             = "{" { Statement } "}" .
-    WhilelessBlock    = "{" { Statement } "}" .
     Statement         =   Block | ";"
-                        | ConstDeclarations | VarDeclarations
+                        | ConstDeclarations | VarDeclarations 
                         | Assignment | IfStatement | WhileStatement
                         | ReturnStatement | HaltStatement
                         | ReadStatement | WriteStatement 
 						| DoWhileStatement | "break" | "continue" 
-						| ForStatement | MultiAssign .
-	WhilelessStatement =   WhilelessBlock | ";"
-                        | ConstDeclarations | VarDeclarations
-                        | Assignment | IfStatement
-                        | ReturnStatement | HaltStatement
-                        | ReadStatement | WriteStatement 
-						| DoWhileStatement | "break" | "continue" 
-						| ForStatement | MultiAssign .
+						| ForStatement .
     ConstDeclarations = "const" OneConst { "," OneConst } ";" .
     OneConst          = identifier AssignOp Constant .
     Constant          =   number | charLit
                         | "true" | "false" | "null" .
     VarDeclarations   = Type OneVar { "," OneVar } ";" .
     OneVar            = identifier [ "=" Expression ] .
-	MultiAssign       = Designator { "," Designator } "=" Expression { "," Expression } .
-    Assignment        = Designator AssignOp Expression ";" .
+	MultiAssign       = "," Designator{","Designator}  "=" Expression { "," Expression } .
+    Assignment        = Designator ((AssignOp Expression) | MultiAssign )";".
 	ForAssignment     = Designator AssignOp Expression .
     Designator        = identifier [ "[" Expression "]" ] .
     IfStatement       = "if" "(" Condition ")" Statement { ElseIfExtend } [ ElseExtend ] .
 	ElseExtend        = "else" Statement .
 	ElseIfExtend      = "elsif" "(" Condition ")" Statement .
     WhileStatement    = "while" "(" Condition ")" Statement .
-	DoWhileStatement  = "do" ("{" { Statement } "}" | { WhilelessStatement } ) "while" "(" Condition ")" ";" .
+	DoWhileStatement  = "do" Statement "while" "(" Condition ")" ";" .
 	ForStatement      = "for" ( ForAssignment | Expression ) ( "to" | "downto" ) Expression Statement .
     ReturnStatement   = "return" ";" .
     HaltStatement     = "halt" ";" .

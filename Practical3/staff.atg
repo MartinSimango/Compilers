@@ -1,5 +1,5 @@
 COMPILER Staff  $CN
-
+/* Martin Simango , Louise Poole, Matthew Doherty   */
 CHARACTERS
   uletters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".
   lletters = "abcdefghijklmnopqrstuvwxyz".
