@@ -5,11 +5,12 @@ COMPILER Home
 IGNORE CHR(0) .. CHR(31)
 
 PRODUCTIONS
-  Home      = Family { Pets } [ Vehicle ] "house" .
-  Pets      = "dog" [ "cat" ] | "cat" .
-  Vehicle   = ( "scooter" | "bicycle" ) "fourbyfour" .
-  Family    = Parents { Child } .
-  Parents   = [ "Dad" ] [ "Mom" ] | "Mom" "Dad" .
+  Home      = Family Pets VehOrHouse .
+  VehOrHouse= BikeOrScoot "fourbyfour" "house" | "house" .
+  Pets      = "dog" | "cat" | Pets "cat" .
+  BikeOrScoot= "scooter" | "bicycle" .
+  Family    = Parents | Family Child .
+  Parents   = "Dad"  | "Mom" | "Mom" "Dad"  .
   Child     =   "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
 END Home.
