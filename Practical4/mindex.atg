@@ -9,7 +9,7 @@ CHARACTERS
   digit      = "0123456789" .
 
 TOKENS
-  word     = (uletter | lletter) {lletter}((["-"|"'"]({lletter} | digit{digit}) ) | ["++" | "#"{lletter}] ). /* to accept c# and c#minor" */
+  word     = (uletter | lletter) {lletter} (( ["-"|"'"] ({lletter} | digit{digit}) ) | ["++" | "#" {lletter}] ) . /* to accept c# and c#minor" */
   number   = digit {digit} .
  
   
@@ -18,8 +18,9 @@ COMMENTS FROM "(*" TO "*)"  NESTED
 IGNORE control
 
 PRODUCTIONS
-  MIndex       = { Production "."} EOF .
+  MIndex       = { Production "." } EOF .
   Production  = Phrase (Numbers | "--" "see" Phrase ) .
-  Phrase  	  = word[","]{word[","] ["(" word[","]{word[","]} ")"]} .
+  Phrase  	  =  WordPhrase { WordPhrase} .
+  WordPhrase  = word [","] ["(" word[","]{word[","] } ")"] .
   Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
 END MIndex.
