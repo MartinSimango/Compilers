@@ -1,16 +1,17 @@
-COMPILER Home
+COMPILER Home $CN
 /* Meet the family
    P.D. Terry, Rhodes University, 2016 */
 
 IGNORE CHR(0) .. CHR(31)
 
 PRODUCTIONS
-  Home      = Family Pets VehOrHouse "house" .
-  VehOrHouse= BikeOrScoot "fourbyfour" | .
-  Pets      = "dog" Pets | "cat" Pets | .
-  BikeOrScoot= "scooter" | "bicycle" .
-  Family    = Parents | Child Family | .
-  Parents   = "Dad"  | "Mom" | "Mom" "Dad" .
-  Child     =   "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
+  Home      = Family Pets Vehicle "house" .
+  Vehicle   = BikeOrScoot "fourbyfour" |  .
+  Pets      = "dog" Pets | "cat" Pets |  .
+  BikeOrScoot = "scooter" | "bicycle" .
+  Family    = Parents Children .
+  Children  = Child | Children Child | .
+  Parents   = "Dad"  | "Mom" | "Mom" "Dad" |  .
+  Child     =  "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
 END Home. 
