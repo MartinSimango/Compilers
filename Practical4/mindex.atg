@@ -1,0 +1,25 @@
+COMPILER MIndex $CN
+/* Recognize Index
+   P.D. Terry, Rhodes University, 2007 */
+
+CHARACTERS
+  control    = CHR(0) .. CHR(31) .
+  uletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
+  lletter    = "abcdefghijklmnopqrstuvwxyz" .
+  digit      = "0123456789" .
+
+TOKENS
+  word     = (uletter | lletter) {lletter}((["-"|"'"]({lletter} | digit{digit}) ) | ["++" | "#"{lletter}] ). /* to accept c# and c#minor" */
+  number   = digit {digit} .
+ 
+  
+COMMENTS FROM "(*" TO "*)"  NESTED
+
+IGNORE control
+
+PRODUCTIONS
+  MIndex       = { Production "."} EOF .
+  Production  = Phrase (Numbers | "--" "see" Phrase ) .
+  Phrase  	  = word[","]{word[","] ["(" word[","]{word[","]} ")"]} .
+  Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
+END MIndex.
