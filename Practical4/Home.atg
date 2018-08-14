@@ -5,12 +5,12 @@ COMPILER Home
 IGNORE CHR(0) .. CHR(31)
 
 PRODUCTIONS
-  Home      = Family Pets VehOrHouse .
-  VehOrHouse= BikeOrScoot "fourbyfour" "house" | "house" .
-  Pets      = "dog" | "cat" | Pets "cat" .
+  Home      = Family Pets VehOrHouse "house" .
+  VehOrHouse= BikeOrScoot "fourbyfour" | .
+  Pets      = "dog" Pets | "cat" Pets | .
   BikeOrScoot= "scooter" | "bicycle" .
-  Family    = Parents | Family Child .
-  Parents   = "Dad"  | "Mom" | "Mom" "Dad"  .
+  Family    = Parents | Child Family | .
+  Parents   = "Dad"  | "Mom" | "Mom" "Dad" .
   Child     =   "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
-END Home.
+END Home. 
