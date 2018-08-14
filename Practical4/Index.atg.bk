@@ -1,0 +1,37 @@
+COMPILER Index $CN
+/* Recognize Index
+   P.D. Terry, Rhodes University, 2007 */
+
+CHARACTERS
+  control  = CHR(0) .. CHR(31) .
+  uletter  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
+  lletter  = "abcdefghijklmnopqrstuvwxyz" .
+  lowline  = "_" .
+  digit    = "0123456789" .
+
+TOKENS
+  word     = (uletter | lletter) {uletter | lletter} .
+  number   = digit {digit} .
+  plus     = "+" .
+  dash    = "-" .
+  comma   = "," .
+  
+COMMENTS FROM "(*" TO "*)"  NESTED
+
+IGNORE control
+
+PRODUCTIONS
+  Index       = { Production } EOF .
+  Production  = word {word}[ "-" (number | Comment)] Sym .
+  Sym        =   Numbers
+			   | Bracket			  
+			   | List 
+			   | word number .
+			    
+  
+  List       = comma (dash Comment | word {word} Numbers ["," word number]) .
+  Comment    = dash word {word} .
+  Bracket     = "(" word {word} {plus} ")" Numbers .
+				
+  Numbers     = number {[comma] [dash] number} .
+END Index.

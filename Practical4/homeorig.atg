@@ -1,0 +1,15 @@
+COMPILER Home
+/* Meet the family
+   P.D. Terry, Rhodes University, 2016 */
+
+IGNORE CHR(0) .. CHR(31)
+
+PRODUCTIONS
+  Home      = Family { Pets } [ Vehicle ] "house" .
+  Pets      = "dog" [ "cat" ] | "cat" .
+  Vehicle   = ( "scooter" | "bicycle" ) "fourbyfour" .
+  Family    = Parents { Child } .
+  Parents   = [ "Dad" ] [ "Mom" ] | "Mom" "Dad" .
+  Child     =   "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
+              | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
+END Home.
