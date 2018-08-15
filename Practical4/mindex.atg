@@ -18,9 +18,9 @@ COMMENTS FROM "(*" TO "*)"  NESTED
 IGNORE control
 
 PRODUCTIONS
-  MIndex       = { Production "." } EOF .
+  MIndex       = { Production "." } EOF . /* Used periods to indicate the end of a line (so edited index.txt) */
   Production  = Phrase (Numbers | "--" "see" Phrase ) .
   Phrase  	  =  WordPhrase { WordPhrase} .
-  WordPhrase  = word [","] ["(" word[","]{word[","] } ")"] .
+  WordPhrase  = word ["(" word[","]{word[","] } ")"][","] .
   Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
 END MIndex.
