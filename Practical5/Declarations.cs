@@ -106,10 +106,10 @@
                 GetChar();
             } while (Char.IsLetterOrDigit(ch));
 
-            if (symLex.Equals("int")) symKind = intSym;
-            else if (symLex.Equals("char")) symKind = charSym;
-            else if (symLex.Equals("bool")) symKind = boolSym;
-            else if (symLex.Equals("void")) symKind = voidSym;
+            if (symLex.ToString().Equals("int")) symKind = intSym;
+            else if (symLex.ToString().Equals("char")) symKind = charSym;
+            else if (symLex.ToString().Equals("bool")) symKind = boolSym;
+            else if (symLex.ToString().Equals("void")) symKind = voidSym;
             else symKind = identSym;
         }
         else if (Char.IsDigit(ch))
