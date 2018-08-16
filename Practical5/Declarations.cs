@@ -110,7 +110,7 @@
             else if (symLex.Equals("char")) symKind = charSym;
             else if (symLex.Equals("bool")) symKind = boolSym;
             else if (symLex.Equals("void")) symKind = voidSym;
-            else symKind = indetSym;
+            else symKind = identSym;
         }
         else if (Char.IsDigit(ch))
         {
