@@ -97,7 +97,6 @@
       while (ch > EOF && ch <= ' ') GetChar();//skip whitespace
       StringBuilder symLex = new StringBuilder();
       int symKind = noSym;
-
         if (Char.IsLetter(ch))
         {
             do
@@ -106,10 +105,10 @@
                 GetChar();
             } while (Char.IsLetterOrDigit(ch));
 
-            if (symLex.Equals("int")) symKind = intSym;
-            else if (symLex.Equals("char")) symKind = charSym;
-            else if (symLex.Equals("bool")) symKind = boolSym;
-            else if (symLex.Equals("void")) symKind = voidSym;
+            if (symLex.ToString().Equals("int")) symKind = intSym;
+            else if (symLex.ToString().Equals("char")) symKind = charSym;
+            else if (symLex.ToString().Equals("bool")) symKind = boolSym;
+            else if (symLex.ToString().Equals("void")) symKind = voidSym;
             else symKind = identSym;
         }
         else if (Char.IsDigit(ch))
@@ -151,6 +150,33 @@
                 case ';':
                     symKind = semiColonSym; GetChar();
                     break;
+				case '/':
+					GetChar();
+					if(ch == '*'){
+						do{
+							GetChar();
+							if(ch=='*'){
+								GetChar();
+								if(ch == '/'){
+									GetChar();
+									break;
+								}
+							}
+						} while(ch!=EOF);
+						GetSym(); 
+					    return;
+ 				}
+					else if(ch == '/'){
+						do{
+							GetChar();
+						}while(ch!='\n');
+						GetChar();
+						GetSym();
+						return;
+					}
+					else
+						symKind = noSym;
+					break;
                 default:
                     symKind = noSym; GetChar();
                     break;
