@@ -1,4 +1,5 @@
-COMPILER MIndex $CN
+COMPILER Index $CN
+/* Louise Poole, Martin Simango, Matt Doherty */
 /* Recognize Index
    P.D. Terry, Rhodes University, 2007 */
 
@@ -6,11 +7,13 @@ CHARACTERS
   control    = CHR(0) .. CHR(31) .
   uletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
   lletter    = "abcdefghijklmnopqrstuvwxyz" .
+  space	     = " " .
   digit      = "0123456789" .
 
 TOKENS
   word     = (uletter | lletter) {lletter} (( ["-"|"'"] ({lletter} | digit{digit}) ) | ["++" | "#" {lletter}] ) . /* to accept c# and c#minor" */
   number   = digit {digit} .
+  comment  = "--" space "see" space { lletter {lletter} | space } .
  
   
 COMMENTS FROM "(*" TO "*)"  NESTED
@@ -18,9 +21,9 @@ COMMENTS FROM "(*" TO "*)"  NESTED
 IGNORE control
 
 PRODUCTIONS
-  MIndex       = { Production "." } EOF . /* Used periods to indicate the end of a line (so edited index.txt) */
-  Production  = Phrase (Numbers | "--" "see" Phrase ) .
+  Index       = { Production } EOF .
+  Production  = Phrase (Numbers | comment) .
   Phrase  	  =  WordPhrase { WordPhrase} .
   WordPhrase  = word ["(" word[","]{word[","] } ")"][","] .
   Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
-END MIndex.
+END Index.

@@ -1,23 +1,32 @@
-  Warning: Family is deletable
-  Warning: Parents is deletable
-  LL1 warning in Pets: "cat" is the start & successor of a deletable structure
-  LL1 warning in Parents: "Mom" is the start of several alternatives
 
-   1 COMPILER Home
-   2 /* Meet the family
-   3    P.D. Terry, Rhodes University, 2016 */
-   4 
-   5 IGNORE CHR(0) .. CHR(31)
-   6 
-   7 PRODUCTIONS
-   8   Home      = Family { Pets } [ Vehicle ] "house" .
-   9   Pets      = "dog" [ "cat" ] | "cat" .
-  10   Vehicle   = ( "scooter" | "bicycle" ) "fourbyfour" .
-  11   Family    = Parents { Child } .
-  12   Parents   = [ "Dad" ] [ "Mom" ] | "Mom" "Dad" .
-  13   Child     =   "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
-  14               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
-  15 END Home.
+   1 COMPILER Index $CN
+   2 /* Louise Poole, Martin Simango, Matt Doherty */
+   3 /* Recognize Index
+   4    P.D. Terry, Rhodes University, 2007 */
+   5 
+   6 CHARACTERS
+   7   control    = CHR(0) .. CHR(31) .
+   8   uletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
+   9   lletter    = "abcdefghijklmnopqrstuvwxyz" .
+  10   space	     = " " .
+  11   digit      = "0123456789" .
+  12 
+  13 TOKENS
+  14   word     = (uletter | lletter) {lletter} (( ["-"|"'"] ({lletter} | digit{digit}) ) | ["++" | "#" {lletter}] ) . /* to accept c# and c#minor" */
+  15   number   = digit {digit} .
+  16   comment  = "--" space "see" space { lletter {lletter} | space } .
+  17  
+  18   
+  19 COMMENTS FROM "(*" TO "*)"  NESTED
+  20 
+  21 IGNORE control
+  22 
+  23 PRODUCTIONS
+  24   Index       = { Production } EOF .
+  25   Production  = Phrase (Numbers | comment) .
+  26   Phrase  	  =  WordPhrase { WordPhrase} .
+  27   WordPhrase  = word ["(" word[","]{word[","] } ")"][","] .
+  28   Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
+  29 END Index.
 
 0 errors detected
-4 warnings detected

@@ -1,4 +1,5 @@
 COMPILER Index $CN
+/* Louise Poole, Martin Simango, Matt Doherty */
 /* Recognize Index
    P.D. Terry, Rhodes University, 2007 */
 
@@ -6,16 +7,14 @@ CHARACTERS
   control    = CHR(0) .. CHR(31) .
   uletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
   lletter    = "abcdefghijklmnopqrstuvwxyz" .
-  underscore = "_" .
+  space	     = " " .
   digit      = "0123456789" .
 
 TOKENS
-  word     = (uletter | lletter) {uletter | lletter} .
+  word     = (uletter | lletter) {lletter} (( ["-"|"'"] ({lletter} | digit{digit}) ) | ["++" | "#" {lletter}] ) . /* to accept c# and c#minor" */
   number   = digit {digit} .
-  plus     = "+" .
-  dash    = "-" .
-  comma   = "," .
-  doubled = "--" .
+  comment  = "--" space "see" space { lletter {lletter} | space } .
+ 
   
 COMMENTS FROM "(*" TO "*)"  NESTED
 
@@ -23,7 +22,8 @@ IGNORE control
 
 PRODUCTIONS
   Index       = { Production } EOF .
-  Production  = Phrase Numbers Phrase .
-  Phrase  	  = word {word} ["(" word {word} ")"] [comma word {word}] .
-  Numbers     = [dash number] number [dash number] [comma number] .  
+  Production  = Phrase (Numbers | comment) .
+  Phrase  	  =  WordPhrase { WordPhrase} .
+  WordPhrase  = word ["(" word[","]{word[","] } ")"][","] .
+  Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
 END Index.

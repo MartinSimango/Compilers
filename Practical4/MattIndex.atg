@@ -1,0 +1,29 @@
+COMPILER Index $CN
+/* Recognize Index
+   P.D. Terry, Rhodes University, 2007 */
+
+CHARACTERS
+  control    = CHR(0) .. CHR(31) .
+  uletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
+  lletter    = "abcdefghijklmnopqrstuvwxyz" .
+  underscore = "_" .
+  digit      = "0123456789" .
+
+TOKENS
+  word     = (uletter | lletter) {uletter | lletter} .
+  number   = digit {digit} .
+  plus     = "+" .
+  dash    = "-" .
+  comma   = "," .
+  doubled = "--" .
+  
+COMMENTS FROM "(*" TO "*)"  NESTED
+
+IGNORE control
+
+PRODUCTIONS
+  Index       = { Production } EOF .
+  Production  = Phrase Numbers Phrase .
+  Phrase  	  = word {word} ["(" word {word} ")"] [comma word {word}] .
+  Numbers     = [dash number] number [dash number] [comma number] .  
+END Index.

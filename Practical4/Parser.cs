@@ -3,11 +3,27 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Home {
+namespace Index {
 
 public class Parser {
 	public const int _EOF = 0;
-	public const int maxT = 18;
+	public const int _word = 1;
+	public const int _number = 2;
+	public const int _comment = 3;
+	// terminals
+	public const int EOF_SYM = 0;
+	public const int word_Sym = 1;
+	public const int number_Sym = 2;
+	public const int comment_Sym = 3;
+	public const int lparen_Sym = 4;
+	public const int comma_Sym = 5;
+	public const int rparen_Sym = 6;
+	public const int minus_Sym = 7;
+	public const int Appendix_Sym = 8;
+	public const int NOT_SYM = 9;
+	// pragmas
+
+	public const int maxT = 9;
 
 	const bool T = true;
 	const bool x = false;
@@ -91,97 +107,68 @@ public class Parser {
 		}
 	}
 
-	static void Home() {
-		Family();
-		while (la.kind == 2 || la.kind == 3) {
-			Pets();
+	static void Index() {
+		while (la.kind == word_Sym) {
+			Production();
 		}
-		if (la.kind == 4 || la.kind == 5) {
-			Vehicle();
-		}
-		Expect(1);
+		Expect(EOF_SYM);
 	}
 
-	static void Family() {
-		Parents();
-		while (StartOf(1)) {
-			Child();
-		}
-	}
-
-	static void Pets() {
-		if (la.kind == 2) {
+	static void Production() {
+		Phrase();
+		if (la.kind == number_Sym) {
+			Numbers();
+		} else if (la.kind == comment_Sym) {
 			Get();
-			if (la.kind == 3) {
+		} else SynErr(10);
+	}
+
+	static void Phrase() {
+		WordPhrase();
+		while (la.kind == word_Sym) {
+			WordPhrase();
+		}
+	}
+
+	static void Numbers() {
+		Expect(number_Sym);
+		if (la.kind == minus_Sym) {
+			Get();
+			Expect(number_Sym);
+		}
+		while (la.kind == comma_Sym) {
+			Get();
+			if (la.kind == number_Sym) {
+				Get();
+				if (la.kind == minus_Sym) {
+					Get();
+					Expect(number_Sym);
+				}
+			} else if (la.kind == Appendix_Sym) {
+				Get();
+				Expect(number_Sym);
+			} else SynErr(11);
+		}
+	}
+
+	static void WordPhrase() {
+		Expect(word_Sym);
+		if (la.kind == lparen_Sym) {
+			Get();
+			Expect(word_Sym);
+			if (la.kind == comma_Sym) {
 				Get();
 			}
-		} else if (la.kind == 3) {
-			Get();
-		} else SynErr(19);
-	}
-
-	static void Vehicle() {
-		if (la.kind == 4) {
-			Get();
-		} else if (la.kind == 5) {
-			Get();
-		} else SynErr(20);
-		Expect(6);
-	}
-
-	static void Parents() {
-		if (StartOf(2)) {
-			if (la.kind == 7) {
+			while (la.kind == word_Sym) {
 				Get();
+				if (la.kind == comma_Sym) {
+					Get();
+				}
 			}
-			if (la.kind == 8) {
-				Get();
-			}
-		} else if (la.kind == 8) {
-			Get();
-			Expect(7);
-		} else SynErr(21);
-	}
-
-	static void Child() {
-		switch (la.kind) {
-		case 9: {
-			Get();
-			break;
+			Expect(rparen_Sym);
 		}
-		case 10: {
+		if (la.kind == comma_Sym) {
 			Get();
-			break;
-		}
-		case 11: {
-			Get();
-			break;
-		}
-		case 12: {
-			Get();
-			break;
-		}
-		case 13: {
-			Get();
-			break;
-		}
-		case 14: {
-			Get();
-			break;
-		}
-		case 15: {
-			Get();
-			break;
-		}
-		case 16: {
-			Get();
-			break;
-		}
-		case 17: {
-			Get();
-			break;
-		}
-		default: SynErr(22); break;
 		}
 	}
 
@@ -191,15 +178,13 @@ public class Parser {
 		la = new Token();
 		la.val = "";
 		Get();
-		Home();
-		Expect(0);
+		Index();
+		Expect(EOF_SYM);
 
 	}
 
 	static bool[,] set = {
-		{T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x},
-		{x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, T,T,x,x},
-		{x,T,T,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,x,x}
+		{T,x,x,x, x,x,x,x, x,x,x}
 
 	};
 
@@ -312,28 +297,17 @@ public class Errors {
 		string s;
 		switch (n) {
 			case 0: s = "EOF expected"; break;
-			case 1: s = "\"house\" expected"; break;
-			case 2: s = "\"dog\" expected"; break;
-			case 3: s = "\"cat\" expected"; break;
-			case 4: s = "\"scooter\" expected"; break;
-			case 5: s = "\"bicycle\" expected"; break;
-			case 6: s = "\"fourbyfour\" expected"; break;
-			case 7: s = "\"Dad\" expected"; break;
-			case 8: s = "\"Mom\" expected"; break;
-			case 9: s = "\"Helen\" expected"; break;
-			case 10: s = "\"Margaret\" expected"; break;
-			case 11: s = "\"Alice\" expected"; break;
-			case 12: s = "\"Robyn\" expected"; break;
-			case 13: s = "\"Cathy\" expected"; break;
-			case 14: s = "\"Janet\" expected"; break;
-			case 15: s = "\"Anne\" expected"; break;
-			case 16: s = "\"Ntombizodwa\" expected"; break;
-			case 17: s = "\"Ntombizanele\" expected"; break;
-			case 18: s = "??? expected"; break;
-			case 19: s = "invalid Pets"; break;
-			case 20: s = "invalid Vehicle"; break;
-			case 21: s = "invalid Parents"; break;
-			case 22: s = "invalid Child"; break;
+			case 1: s = "word expected"; break;
+			case 2: s = "number expected"; break;
+			case 3: s = "comment expected"; break;
+			case 4: s = "\"(\" expected"; break;
+			case 5: s = "\",\" expected"; break;
+			case 6: s = "\")\" expected"; break;
+			case 7: s = "\"-\" expected"; break;
+			case 8: s = "\"Appendix\" expected"; break;
+			case 9: s = "??? expected"; break;
+			case 10: s = "invalid Production"; break;
+			case 11: s = "invalid Numbers"; break;
 
 			default: s = "error " + n; break;
 		}
