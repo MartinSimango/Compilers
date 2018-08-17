@@ -10,8 +10,10 @@ PRODUCTIONS
   Pets      = "dog" Pets | "cat" Pets |  .
   BikeOrScoot = "scooter" | "bicycle" .
   Family    = Parents Children .
-  Children  = Child | Children Child | .
-  Parents   = "Dad"  | "Mom" | "Mom" "Dad" |  .
+  Children  = Child Children | .
+  Parents   = Mother Father .
+  Mother    = "Mom" |  .
+  Father    = "Dad" |  .
   Child     =  "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
 END Home. 

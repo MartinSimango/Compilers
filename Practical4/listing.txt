@@ -1,29 +1,27 @@
+  Warning: Family is deletable
+  Warning: Pets is deletable
+  Warning: Vehicle is deletable
+  Warning: Parents is deletable
+  Warning: Children is deletable
+  LL1 warning in Parents: "Mom" is the start of several alternatives
 
-   1 COMPILER MIndex $CN
-   2 /* Recognize Index
-   3    P.D. Terry, Rhodes University, 2007 */
+   1 COMPILER Home $CN
+   2 /* Meet the family
+   3    P.D. Terry, Rhodes University, 2016 */
    4 
-   5 CHARACTERS
-   6   control    = CHR(0) .. CHR(31) .
-   7   uletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" .
-   8   lletter    = "abcdefghijklmnopqrstuvwxyz" .
-   9   digit      = "0123456789" .
-  10 
-  11 TOKENS
-  12   word     = (uletter | lletter) {lletter} (( ["-"|"'"] ({lletter} | digit{digit}) ) | ["++" | "#" {lletter}] ) . /* to accept c# and c#minor" */
-  13   number   = digit {digit} .
-  14  
-  15   
-  16 COMMENTS FROM "(*" TO "*)"  NESTED
-  17 
-  18 IGNORE control
-  19 
-  20 PRODUCTIONS
-  21   MIndex       = { Production "." } EOF .
-  22   Production  = Phrase (Numbers | "--" "see" Phrase ) .
-  23   Phrase  	  =  WordPhrase { WordPhrase} .
-  24   WordPhrase  = word [","] ["(" word[","]{word[","] } ")"] .
-  25   Numbers     = number["-"number]{","(number["-"number] | "Appendix" number)}.
-  26 END MIndex.
+   5 IGNORE CHR(0) .. CHR(31)
+   6 
+   7 PRODUCTIONS
+   8   Home      = Family Pets Vehicle "house" .
+   9   Vehicle   = BikeOrScoot "fourbyfour" |  .
+  10   Pets      = "dog" Pets | "cat" Pets |  .
+  11   BikeOrScoot = "scooter" | "bicycle" .
+  12   Family    = Parents Children .
+  13   Children  = Child Children | .
+  14   Parents   = "Dad"  | "Mom" | "Mom" "Dad" |  .
+  15   Child     =  "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
+  16               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
+  17 END Home. 
 
 0 errors detected
+6 warnings detected
