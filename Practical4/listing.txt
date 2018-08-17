@@ -1,27 +1,23 @@
   Warning: Family is deletable
-  Warning: Pets is deletable
-  Warning: Vehicle is deletable
   Warning: Parents is deletable
-  Warning: Children is deletable
+  LL1 warning in Pets: "cat" is the start & successor of a deletable structure
   LL1 warning in Parents: "Mom" is the start of several alternatives
 
-   1 COMPILER Home $CN
+   1 COMPILER Home
    2 /* Meet the family
    3    P.D. Terry, Rhodes University, 2016 */
    4 
    5 IGNORE CHR(0) .. CHR(31)
    6 
    7 PRODUCTIONS
-   8   Home      = Family Pets Vehicle "house" .
-   9   Vehicle   = BikeOrScoot "fourbyfour" |  .
-  10   Pets      = "dog" Pets | "cat" Pets |  .
-  11   BikeOrScoot = "scooter" | "bicycle" .
-  12   Family    = Parents Children .
-  13   Children  = Child Children | .
-  14   Parents   = "Dad"  | "Mom" | "Mom" "Dad" |  .
-  15   Child     =  "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
-  16               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
-  17 END Home. 
+   8   Home      = Family { Pets } [ Vehicle ] "house" .
+   9   Pets      = "dog" [ "cat" ] | "cat" .
+  10   Vehicle   = ( "scooter" | "bicycle" ) "fourbyfour" .
+  11   Family    = Parents { Child } .
+  12   Parents   = [ "Dad" ] [ "Mom" ] | "Mom" "Dad" .
+  13   Child     =   "Helen" | "Margaret" | "Alice" | "Robyn" | "Cathy"
+  14               | "Janet" | "Anne" | "Ntombizodwa" | "Ntombizanele" .
+  15 END Home.
 
 0 errors detected
-6 warnings detected
+4 warnings detected

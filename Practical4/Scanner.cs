@@ -65,28 +65,6 @@ public class Scanner {
 	const int charSetSize = 256;
 	const int maxT = 18;
 	const int noSym = 18;
-	// terminals
-	const int EOF_SYM = 0;
-	const int house_Sym = 1;
-	const int fourbyfour_Sym = 2;
-	const int dog_Sym = 3;
-	const int cat_Sym = 4;
-	const int scooter_Sym = 5;
-	const int bicycle_Sym = 6;
-	const int Dad_Sym = 7;
-	const int Mom_Sym = 8;
-	const int Helen_Sym = 9;
-	const int Margaret_Sym = 10;
-	const int Alice_Sym = 11;
-	const int Robyn_Sym = 12;
-	const int Cathy_Sym = 13;
-	const int Janet_Sym = 14;
-	const int Anne_Sym = 15;
-	const int Ntombizodwa_Sym = 16;
-	const int Ntombizanele_Sym = 17;
-	const int NOT_SYM = 18;
-	// pragmas
-
 	static short[] start = {
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -94,8 +72,8 @@ public class Scanner {
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	  0, 85,  0, 62, 36,  0,  0,  0, 41,  0, 67,  0,  0, 84, 86,  0,
 	  0,  0, 57,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	  0,  0, 29, 19, 16,  0,  6,  0,  1,  0,  0,  0,  0,  0,  0,  0,
-	  0,  0,  0, 22,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	  0,  0, 19,  9,  6,  0, 26,  0,  1,  0,  0,  0,  0,  0,  0,  0,
+	  0,  0,  0, 12,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -204,92 +182,92 @@ public class Scanner {
 				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 5; }
 				else { t.kind = noSym; goto done; }
 			case 5:
-				{ t.kind = house_Sym; goto done; }
+				{ t.kind = 1; goto done; }
 			case 6:
 				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 7; }
 				else { t.kind = noSym; goto done; }
 			case 7:
-				if (ch == 'u') { buf.Append(ch); NextCh(); goto case 8; }
+				if (ch == 'g') { buf.Append(ch); NextCh(); goto case 8; }
 				else { t.kind = noSym; goto done; }
 			case 8:
-				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 9; }
-				else { t.kind = noSym; goto done; }
+				{ t.kind = 2; goto done; }
 			case 9:
-				if (ch == 'b') { buf.Append(ch); NextCh(); goto case 10; }
+				if (ch == 'a') { buf.Append(ch); NextCh(); goto case 10; }
 				else { t.kind = noSym; goto done; }
 			case 10:
-				if (ch == 'y') { buf.Append(ch); NextCh(); goto case 11; }
+				if (ch == 't') { buf.Append(ch); NextCh(); goto case 11; }
 				else { t.kind = noSym; goto done; }
 			case 11:
-				if (ch == 'f') { buf.Append(ch); NextCh(); goto case 12; }
-				else { t.kind = noSym; goto done; }
+				{ t.kind = 3; goto done; }
 			case 12:
-				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 13; }
+				if (ch == 'c') { buf.Append(ch); NextCh(); goto case 13; }
 				else { t.kind = noSym; goto done; }
 			case 13:
-				if (ch == 'u') { buf.Append(ch); NextCh(); goto case 14; }
+				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 14; }
 				else { t.kind = noSym; goto done; }
 			case 14:
-				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 15; }
+				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 15; }
 				else { t.kind = noSym; goto done; }
 			case 15:
-				{ t.kind = fourbyfour_Sym; goto done; }
+				if (ch == 't') { buf.Append(ch); NextCh(); goto case 16; }
+				else { t.kind = noSym; goto done; }
 			case 16:
-				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 17; }
+				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 17; }
 				else { t.kind = noSym; goto done; }
 			case 17:
-				if (ch == 'g') { buf.Append(ch); NextCh(); goto case 18; }
+				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 18; }
 				else { t.kind = noSym; goto done; }
 			case 18:
-				{ t.kind = dog_Sym; goto done; }
+				{ t.kind = 4; goto done; }
 			case 19:
-				if (ch == 'a') { buf.Append(ch); NextCh(); goto case 20; }
+				if (ch == 'i') { buf.Append(ch); NextCh(); goto case 20; }
 				else { t.kind = noSym; goto done; }
 			case 20:
-				if (ch == 't') { buf.Append(ch); NextCh(); goto case 21; }
+				if (ch == 'c') { buf.Append(ch); NextCh(); goto case 21; }
 				else { t.kind = noSym; goto done; }
 			case 21:
-				{ t.kind = cat_Sym; goto done; }
+				if (ch == 'y') { buf.Append(ch); NextCh(); goto case 22; }
+				else { t.kind = noSym; goto done; }
 			case 22:
 				if (ch == 'c') { buf.Append(ch); NextCh(); goto case 23; }
 				else { t.kind = noSym; goto done; }
 			case 23:
-				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 24; }
+				if (ch == 'l') { buf.Append(ch); NextCh(); goto case 24; }
 				else { t.kind = noSym; goto done; }
 			case 24:
-				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 25; }
+				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 25; }
 				else { t.kind = noSym; goto done; }
 			case 25:
-				if (ch == 't') { buf.Append(ch); NextCh(); goto case 26; }
-				else { t.kind = noSym; goto done; }
+				{ t.kind = 5; goto done; }
 			case 26:
-				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 27; }
+				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 27; }
 				else { t.kind = noSym; goto done; }
 			case 27:
-				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 28; }
+				if (ch == 'u') { buf.Append(ch); NextCh(); goto case 28; }
 				else { t.kind = noSym; goto done; }
 			case 28:
-				{ t.kind = scooter_Sym; goto done; }
+				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 29; }
+				else { t.kind = noSym; goto done; }
 			case 29:
-				if (ch == 'i') { buf.Append(ch); NextCh(); goto case 30; }
+				if (ch == 'b') { buf.Append(ch); NextCh(); goto case 30; }
 				else { t.kind = noSym; goto done; }
 			case 30:
-				if (ch == 'c') { buf.Append(ch); NextCh(); goto case 31; }
+				if (ch == 'y') { buf.Append(ch); NextCh(); goto case 31; }
 				else { t.kind = noSym; goto done; }
 			case 31:
-				if (ch == 'y') { buf.Append(ch); NextCh(); goto case 32; }
+				if (ch == 'f') { buf.Append(ch); NextCh(); goto case 32; }
 				else { t.kind = noSym; goto done; }
 			case 32:
-				if (ch == 'c') { buf.Append(ch); NextCh(); goto case 33; }
+				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 33; }
 				else { t.kind = noSym; goto done; }
 			case 33:
-				if (ch == 'l') { buf.Append(ch); NextCh(); goto case 34; }
+				if (ch == 'u') { buf.Append(ch); NextCh(); goto case 34; }
 				else { t.kind = noSym; goto done; }
 			case 34:
-				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 35; }
+				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 35; }
 				else { t.kind = noSym; goto done; }
 			case 35:
-				{ t.kind = bicycle_Sym; goto done; }
+				{ t.kind = 6; goto done; }
 			case 36:
 				if (ch == 'a') { buf.Append(ch); NextCh(); goto case 37; }
 				else { t.kind = noSym; goto done; }
@@ -297,12 +275,12 @@ public class Scanner {
 				if (ch == 'd') { buf.Append(ch); NextCh(); goto case 38; }
 				else { t.kind = noSym; goto done; }
 			case 38:
-				{ t.kind = Dad_Sym; goto done; }
+				{ t.kind = 7; goto done; }
 			case 39:
 				if (ch == 'm') { buf.Append(ch); NextCh(); goto case 40; }
 				else { t.kind = noSym; goto done; }
 			case 40:
-				{ t.kind = Mom_Sym; goto done; }
+				{ t.kind = 8; goto done; }
 			case 41:
 				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 42; }
 				else { t.kind = noSym; goto done; }
@@ -316,7 +294,7 @@ public class Scanner {
 				if (ch == 'n') { buf.Append(ch); NextCh(); goto case 45; }
 				else { t.kind = noSym; goto done; }
 			case 45:
-				{ t.kind = Helen_Sym; goto done; }
+				{ t.kind = 9; goto done; }
 			case 46:
 				if (ch == 'r') { buf.Append(ch); NextCh(); goto case 47; }
 				else { t.kind = noSym; goto done; }
@@ -336,7 +314,7 @@ public class Scanner {
 				if (ch == 't') { buf.Append(ch); NextCh(); goto case 52; }
 				else { t.kind = noSym; goto done; }
 			case 52:
-				{ t.kind = Margaret_Sym; goto done; }
+				{ t.kind = 10; goto done; }
 			case 53:
 				if (ch == 'i') { buf.Append(ch); NextCh(); goto case 54; }
 				else { t.kind = noSym; goto done; }
@@ -347,7 +325,7 @@ public class Scanner {
 				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 56; }
 				else { t.kind = noSym; goto done; }
 			case 56:
-				{ t.kind = Alice_Sym; goto done; }
+				{ t.kind = 11; goto done; }
 			case 57:
 				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 58; }
 				else { t.kind = noSym; goto done; }
@@ -361,7 +339,7 @@ public class Scanner {
 				if (ch == 'n') { buf.Append(ch); NextCh(); goto case 61; }
 				else { t.kind = noSym; goto done; }
 			case 61:
-				{ t.kind = Robyn_Sym; goto done; }
+				{ t.kind = 12; goto done; }
 			case 62:
 				if (ch == 'a') { buf.Append(ch); NextCh(); goto case 63; }
 				else { t.kind = noSym; goto done; }
@@ -375,7 +353,7 @@ public class Scanner {
 				if (ch == 'y') { buf.Append(ch); NextCh(); goto case 66; }
 				else { t.kind = noSym; goto done; }
 			case 66:
-				{ t.kind = Cathy_Sym; goto done; }
+				{ t.kind = 13; goto done; }
 			case 67:
 				if (ch == 'a') { buf.Append(ch); NextCh(); goto case 68; }
 				else { t.kind = noSym; goto done; }
@@ -389,7 +367,7 @@ public class Scanner {
 				if (ch == 't') { buf.Append(ch); NextCh(); goto case 71; }
 				else { t.kind = noSym; goto done; }
 			case 71:
-				{ t.kind = Janet_Sym; goto done; }
+				{ t.kind = 14; goto done; }
 			case 72:
 				if (ch == 'n') { buf.Append(ch); NextCh(); goto case 73; }
 				else { t.kind = noSym; goto done; }
@@ -397,7 +375,7 @@ public class Scanner {
 				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 74; }
 				else { t.kind = noSym; goto done; }
 			case 74:
-				{ t.kind = Anne_Sym; goto done; }
+				{ t.kind = 15; goto done; }
 			case 75:
 				if (ch == 'd') { buf.Append(ch); NextCh(); goto case 76; }
 				else { t.kind = noSym; goto done; }
@@ -408,7 +386,7 @@ public class Scanner {
 				if (ch == 'a') { buf.Append(ch); NextCh(); goto case 78; }
 				else { t.kind = noSym; goto done; }
 			case 78:
-				{ t.kind = Ntombizodwa_Sym; goto done; }
+				{ t.kind = 16; goto done; }
 			case 79:
 				if (ch == 'n') { buf.Append(ch); NextCh(); goto case 80; }
 				else { t.kind = noSym; goto done; }
@@ -422,7 +400,7 @@ public class Scanner {
 				if (ch == 'e') { buf.Append(ch); NextCh(); goto case 83; }
 				else { t.kind = noSym; goto done; }
 			case 83:
-				{ t.kind = Ntombizanele_Sym; goto done; }
+				{ t.kind = 17; goto done; }
 			case 84:
 				if (ch == 'o') { buf.Append(ch); NextCh(); goto case 39; }
 				else if (ch == 'a') { buf.Append(ch); NextCh(); goto case 46; }
