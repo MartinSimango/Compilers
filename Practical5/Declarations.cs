@@ -3,11 +3,10 @@
 
   // This is a skeleton program for developing a parser for C declarations
   // P.D. Terry, Rhodes University, 2015
-
+    
   using Library;
   using System;
   using System.Text;
-
   class Token {
     public int kind;
     public string val;
@@ -63,6 +62,7 @@
       semiColonSym =  12,
       identSym     =  13,
       numSym       =  14;
+      // and others like this
 
     // +++++++++++++++++++++++++++++ Character Handler ++++++++++++++++++++++++++
 
@@ -94,96 +94,101 @@
 
     static void GetSym() {
     // Scans for next sym from input
-      while (ch > EOF && ch <= ' ') GetChar();//skip whitespace
+      while (ch > EOF && ch <= ' ') GetChar();
       StringBuilder symLex = new StringBuilder();
       int symKind = noSym;
-        if (Char.IsLetter(ch))
-        {
-            do
-            {
-                symLex.Append(ch);
-                GetChar();
-            } while (Char.IsLetterOrDigit(ch));
+      if (Char.IsLetter(ch)){
+          do {
+            symLex.Append(ch); 
+            GetChar();
+          } while (Char.IsLetterOrDigit(ch));
+          switch (symLex.ToString()){ // Check this works~!
+            case "int":
+              symKind = intSym;
+              break;
+            case "bool":
+              symKind = boolSym;
+              break;
+            case "char":
+              symKind = charSym;
+              break;
+            case "void":
+              symKind = voidSym;    
+              break;
+            default:
+              symKind = identSym;
+              break;
+          }
+      }
+      else if (Char.IsDigit(ch)){
+        do {
+          symLex.Append(ch);
+          GetChar();
+        } while(Char.IsDigit(ch));
+        symKind = numSym;
+      }
+      else{
+        switch(ch){
+          case EOF:
+            symKind = EOFSym;
+            break;
+          case '(':
+            symKind = lParenSym;
+            break;
+          case ')':
+            symKind = rParenSym;
+            break;
+          case '*':
+            symKind = pointerSym;
+            break;
+          case '[':
+            symKind = lbrackSym;
+            break;
+          case ']':
+            symKind = rbrackSym;
+            break;
+          case ',':
+            symKind = commaSym;
+            break;
+          case ';':
+            symKind = semiColonSym;
+            break;
+          case '/':
+            skipComment();
+            break;
+          default:
+            symKind = noSym;
+            break;
+        }
+        symLex.Append(ch);
+        GetChar();
+      }
+      // over to you!
 
-            if (symLex.ToString().Equals("int")) symKind = intSym;
-            else if (symLex.ToString().Equals("char")) symKind = charSym;
-            else if (symLex.ToString().Equals("bool")) symKind = boolSym;
-            else if (symLex.ToString().Equals("void")) symKind = voidSym;
-            else symKind = identSym;
-        }
-        else if (Char.IsDigit(ch))
-        {
-            do
-            {
-                symLex.Append(ch);
-                GetChar();
-            } while (Char.IsDigit(ch));
-            symKind = numSym;
-        }
-        else
-        {
-            symLex.Append(ch);
-            switch (ch)
-            {
-                case EOF:
-                    symLex = new StringBuilder("EOF");
-                    symKind = EOFSym;
-                    break;
-                case '(':
-                    symKind = lParenSym; GetChar();
-                    break;
-                case ')':
-                    symKind = rParenSym; GetChar();
-                    break;
-                case '*':
-                    symKind = pointerSym; GetChar();
-                    break;
-                case '[':
-                    symKind = lbrackSym; GetChar();
-                    break;
-                case ']':
-                    symKind = rbrackSym; GetChar();
-                    break;
-                case ',':
-                    symKind = commaSym; GetChar();
-                    break;
-                case ';':
-                    symKind = semiColonSym; GetChar();
-                    break;
-				case '/':
-					GetChar();
-					if(ch == '*'){
-						do{
-							GetChar();
-							if(ch=='*'){
-								GetChar();
-								if(ch == '/'){
-									GetChar();
-									break;
-								}
-							}
-						} while(ch!=EOF);
-						GetSym(); 
-					    return;
- 				}
-					else if(ch == '/'){
-						do{
-							GetChar();
-						}while(ch!='\n');
-						GetChar();
-						GetSym();
-						return;
-					}
-					else
-						symKind = noSym;
-					break;
-                default:
-                    symKind = noSym; GetChar();
-                    break;
-            }
-        }
       sym = new Token(symKind, symLex.ToString());
     } // GetSym
+
+
+    void skipComment(){
+      GetChar();
+      // Check if comment closes
+      if (ch == '*'){
+        do{
+          GetChar();
+          if (ch == '*'){ 
+            GetChar();
+            if (ch == '/'){ 
+              GetChar();
+              return;
+            }
+          }
+        }while (ch != '*');
+      }
+      Console.WriteLine("Comment was never closed! Exiting");
+      System.Environment.Exit(1);
+      // exit for fail 
+    }
+    
 
   /*  ++++ Commented out for the moment
 
