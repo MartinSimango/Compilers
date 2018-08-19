@@ -169,7 +169,7 @@
     } // GetSym
 
 
-    void skipComment(){
+    static void skipComment(){
       GetChar();
       // Check if comment closes
       if (ch == '*'){
@@ -193,6 +193,9 @@
   /*  ++++ Commented out for the moment
 
     // +++++++++++++++++++++++++++++++ Parser +++++++++++++++++++++++++++++++++++
+  */
+    // IntSets
+    static IntSet TypeSym = new IntSet(intSym, voidSym, boolSym, charSym);
 
     static void Accept(int wantedSym, string errorMessage) {
     // Checks that lookahead token is wantedSym
@@ -204,9 +207,93 @@
       if (allowedSet.Contains(sym.kind)) GetSym(); else Abort(errorMessage);
     } // Accept
 
-    static void CDecls() {}
+    static void CDecls() {
+      while (sym.kind != EOFSym) DecList(); // GetChar(); 
+    } // CDecls
 
-  ++++++ */
+    static void DecList() {
+      Accept(TypeSym, "Type expected");
+      OneDecl();
+      while (sym.kind == commaSym){
+        Accept(semiColonSym, "; expected");
+        OneDecl();
+      }
+      Accept(semiColonSym, "; expected");
+    }
+
+    static void OneDecl(){
+      if (sym.kind == pointerSym){
+        Accept(pointerSym, "* expected");
+        OneDecl();
+      }
+      else Direct();
+    }
+
+    static void Direct(){
+    //Direct = ( ident | "(" OneDecl ")" ) [ Suffix ] .
+      if (sym.kind == lbrackSym){
+        Accept(lParenSym, "( expected");
+        OneDecl();
+        Accept(rParenSym, ") expected");
+      }
+      else Accept(identSym, "identifier expected");
+      // first(Suffix) -> first(Array) -> "[" 
+      if (sym.kind == lbrackSym){
+        Accept(lbrackSym, "[ expect");
+        Suffix();
+      }
+    }
+
+    static void Suffix(){ 
+      //Suffix = Array { Array } | Params .
+      if (sym.kind == rbrackSym){
+        Array(); 
+        while (sym.kind == rbrackSym) Array();
+      }
+      else Params();
+    }
+
+    static void Params(){
+      //Params = "(" [ OneParam { "," OneParam } ] ")" .
+      Accept(lParenSym, "( expected");
+      // first(OneParam) -> identSym
+      if (sym.kind == identSym){
+        OneParam();
+        while (sym.kind == commaSym) OneParam();
+      }
+      Accept(rParenSym, ") expected");
+    }
+
+    static IntSet firstOneDecl = new IntSet(pointerSym, identSym, lbrackSym);
+
+    static void OneParam(){
+      //OneDecl = "*" OneDecl | Direct .
+      Accept(TypeSym, "Type expected");
+      if(firstOneDecl.Contains(sym.kind)) OneDecl();
+    }
+
+    static void Array(){
+      //Array = "[" [ number ] "]" .
+      Accept(rbrackSym, "[ expected");
+      if (sym.kind == numSym) Accept(numSym, "number expected");
+      Accept(rbrackSym, "] expected");
+    }
+
+/*
+   PRODUCTIONS
+   Cdecls = { DecList } EOF .
+   DecList = Type OneDecl { "," OneDecl } ";" .
+   Type = "int" | "void" | "bool" | "char" .
+   OneDecl = "*" OneDecl | Direct .
+   Direct = ( ident | "(" OneDecl ")" ) [ Suffix ] .
+   Suffix = Array { Array } | Params .
+   Params = "(" [ OneParam { "," OneParam } ] ")" .
+   OneParam = Type [ OneDecl ] .
+   Array = "[" [ number ] "]" .
+   END Cdecls.
+*/
+
+/*  ++++++ */
 
     // +++++++++++++++++++++ Main driver function +++++++++++++++++++++++++++++++
 
@@ -229,14 +316,13 @@
         OutFile.StdOut.WriteLine(" " + sym.val);  // See what we got
       } while (sym.kind != EOFSym);
 
-  /*  After the scanner is debugged we shall substitute this code:
+  /*  After the scanner is debugged we shall substitute this code: */
 
       GetSym();                                   // Lookahead symbol
       CDecls();                                   // Start to parse from the goal symbol
       // if we get back here everything must have been satisfactory
       Console.WriteLine("Parsed correctly");
 
-  */
       output.Close();
     } // Main
 
