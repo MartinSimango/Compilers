@@ -212,11 +212,18 @@
     } // CDecls
 
     static void DecList() {
-      Accept(TypeSym, "Type expected");
-      OneDecl();
+      if (TypeSym.Contains(sym.kind)) 
+        Accept(TypeSym, "Type expected");
+      else Abort("Type expected");
+
+      if (sym.kind == pointerSym)
+        OneDecl();
+      else Abort("* expected");
       while (sym.kind == commaSym){
         Accept(semiColonSym, "; expected");
-        OneDecl();
+        if (sym.kind == pointerSym)
+          OneDecl();
+        else Abort("* expected");
       }
       Accept(semiColonSym, "; expected");
     }
@@ -226,8 +233,12 @@
         Accept(pointerSym, "* expected");
         OneDecl();
       }
-      else Direct();
+      else if (firstDirect.Contains(sym.kind)) Direct(); 
+      else Abort("OneDecl alternative");
     }
+
+
+    static IntSet firstDirect = new IntSet(identSym, lParenSym); 
 
     static void Direct(){
     //Direct = ( ident | "(" OneDecl ")" ) [ Suffix ] .
