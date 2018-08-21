@@ -190,12 +190,36 @@
     }
     
 
+/*
+   PRODUCTIONS
+   Cdecls = { DecList } EOF .
+   DecList = Type OneDecl { "," OneDecl } ";" .
+   Type = "int" | "void" | "bool" | "char" .
+   OneDecl = "*" OneDecl | Direct .
+   Direct = ( ident | "(" OneDecl ")" ) [ Suffix ] .
+   Suffix = Array { Array } | Params .
+   Params = "(" [ OneParam { "," OneParam } ] ")" .
+   OneParam = Type [ OneDecl ] .
+   Array = "[" [ number ] "]" .
+   END Cdecls.
+*/
   /*  ++++ Commented out for the moment
 
     // +++++++++++++++++++++++++++++++ Parser +++++++++++++++++++++++++++++++++++
   */
-    // IntSets
-    static IntSet TypeSym = new IntSet(intSym, voidSym, boolSym, charSym);
+    // first sets
+    static IntSet 
+      firstDecList = new IntSet(firstType),
+      firstType = new IntSet(intSym, voidSym, boolSym, charSym),
+      firstOneDecl = new IntSet(pointerSym, firstDirect),
+      firstDirect = new IntSet(identSym, lParenSym),
+      firstSuffix = new IntSet(firstArray, firstParams),
+      firstParams = new IntSet(lParenSym),
+      firstOneParam = new IntSet(firstType),
+      firstArray = new IntSet(lbrackSym);
+
+    // follow sets
+
 
     static void Accept(int wantedSym, string errorMessage) {
     // Checks that lookahead token is wantedSym
@@ -208,27 +232,32 @@
     } // Accept
 
     static void CDecls() {
-      while (sym.kind != EOFSym) DecList(); // GetChar(); 
+      //Cdecls = { DecList } EOF .
+      while (firstDecList.Contains(sym.kind)) DecList(); // GetChar(); 
     } // CDecls
 
     static void DecList() {
-      if (TypeSym.Contains(sym.kind)) 
-        Accept(TypeSym, "Type expected");
+      //DecList = Type OneDecl { "," OneDecl } ";" .
+      if (firstType.Contains(sym.kind)) 
+        Accept(firstType, "Type expected");
       else Abort("Type expected");
 
-      if (sym.kind == pointerSym)
+      if (firstOneDecl(sym.kind))
         OneDecl();
-      else Abort("* expected");
+      else Abort("OneDecl expected");
       while (sym.kind == commaSym){
         Accept(semiColonSym, "; expected");
-        if (sym.kind == pointerSym)
+        if (firstOneDecl.Contains(sym.kind))
           OneDecl();
-        else Abort("* expected");
+        else Abort("OneDecl expected");
       }
-      Accept(semiColonSym, "; expected");
+      if (sym.kind == commaSym){
+        Accept(semiColonSym, "; expected");
+      else Abort("; expected");
     }
 
     static void OneDecl(){
+      //OneDecl = "*" OneDecl | Direct .
       if (sym.kind == pointerSym){
         Accept(pointerSym, "* expected");
         OneDecl();
@@ -237,27 +266,30 @@
       else Abort("OneDecl alternative");
     }
 
-
-    static IntSet firstDirect = new IntSet(identSym, lParenSym); 
-
     static void Direct(){
     //Direct = ( ident | "(" OneDecl ")" ) [ Suffix ] .
-      if (sym.kind == lbrackSym){
+      if (sym.kind == lParenSym)){
         Accept(lParenSym, "( expected");
-        OneDecl();
-        Accept(rParenSym, ") expected");
+        if (firstOneDecl.Contains(sym.kind))
+          OneDecl();
+        else Abort("firstOneDecl error");
+        if (sym.kind == rParenSym))
+          Accept(rParenSym, ") expected");
+        else Abort(") expected");
       }
-      else Accept(identSym, "identifier expected");
+      else if (sym.kind == identSym) 
+        Accept(identSym, "identifier expected");
+      else Abort("firstDirect expected");
       // first(Suffix) -> first(Array) -> "[" 
-      if (sym.kind == lbrackSym){
-        Accept(lbrackSym, "[ expect");
+      if (firstSuffix.Contains(sym.kind)){
         Suffix();
+      else Abort("firstSuffix expected");
       }
     }
 
     static void Suffix(){ 
       //Suffix = Array { Array } | Params .
-      if (sym.kind == rbrackSym){
+      if (firstArray.Contains(sym.kind)){
         Array(); 
         while (sym.kind == rbrackSym) Array();
       }
@@ -268,24 +300,25 @@
       //Params = "(" [ OneParam { "," OneParam } ] ")" .
       Accept(lParenSym, "( expected");
       // first(OneParam) -> identSym
-      if (sym.kind == identSym){
+      if (firstOneParam.Contains(sym.kind)){
         OneParam();
         while (sym.kind == commaSym) OneParam();
       }
       Accept(rParenSym, ") expected");
     }
 
-    static IntSet firstOneDecl = new IntSet(pointerSym, identSym, lbrackSym);
-
     static void OneParam(){
-      //OneDecl = "*" OneDecl | Direct .
-      Accept(TypeSym, "Type expected");
+      //OneParam = Type [ OneDecl ] .
+      if (firstType.Contains(sym.kind))
+        Accept(firstType, "Type expected");
+      else Abort("Type expected");
       if(firstOneDecl.Contains(sym.kind)) OneDecl();
     }
 
     static void Array(){
       //Array = "[" [ number ] "]" .
-      Accept(rbrackSym, "[ expected");
+      if (firstArray.Contains(sym.kind))
+        Accept(rbrackSym, "[ expected");
       if (sym.kind == numSym) Accept(numSym, "number expected");
       Accept(rbrackSym, "] expected");
     }
@@ -320,13 +353,13 @@
       GetChar();                                  // Lookahead character
 
   //  To test the scanner we can use a loop like the following:
-
+  /*
       do {
         GetSym();                                 // Lookahead symbol
         OutFile.StdOut.Write(sym.kind, 3);
         OutFile.StdOut.WriteLine(" " + sym.val);  // See what we got
       } while (sym.kind != EOFSym);
-
+  */
   /*  After the scanner is debugged we shall substitute this code: */
 
       GetSym();                                   // Lookahead symbol
