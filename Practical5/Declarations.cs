@@ -209,13 +209,13 @@
   */
     // first sets
     static IntSet 
-      firstDecList = new IntSet(firstType),
+      firstDecList = new IntSet(intSym, voidSym, boolSym, charSym),
       firstType = new IntSet(intSym, voidSym, boolSym, charSym),
-      firstOneDecl = new IntSet(pointerSym, firstDirect),
+      firstOneDecl = new IntSet(pointerSym, identSym, lParenSym),
       firstDirect = new IntSet(identSym, lParenSym),
-      firstSuffix = new IntSet(firstArray, firstParams),
+      firstSuffix = new IntSet(lbrackSym, lParenSym),
       firstParams = new IntSet(lParenSym),
-      firstOneParam = new IntSet(firstType),
+      firstOneParam = new IntSet(intSym, voidSym, boolSym, charSym),
       firstArray = new IntSet(lbrackSym);
 
     // follow sets
@@ -242,7 +242,7 @@
         Accept(firstType, "Type expected");
       else Abort("Type expected");
 
-      if (firstOneDecl(sym.kind))
+      if (firstOneDecl.Contains(sym.kind))
         OneDecl();
       else Abort("OneDecl expected");
       while (sym.kind == commaSym){
@@ -251,7 +251,7 @@
           OneDecl();
         else Abort("OneDecl expected");
       }
-      if (sym.kind == commaSym){
+      if (sym.kind == semiColonSym)
         Accept(semiColonSym, "; expected");
       else Abort("; expected");
     }
@@ -268,12 +268,12 @@
 
     static void Direct(){
     //Direct = ( ident | "(" OneDecl ")" ) [ Suffix ] .
-      if (sym.kind == lParenSym)){
+      if (sym.kind == lParenSym){
         Accept(lParenSym, "( expected");
         if (firstOneDecl.Contains(sym.kind))
           OneDecl();
         else Abort("firstOneDecl error");
-        if (sym.kind == rParenSym))
+        if (sym.kind == rParenSym)
           Accept(rParenSym, ") expected");
         else Abort(") expected");
       }
@@ -281,10 +281,8 @@
         Accept(identSym, "identifier expected");
       else Abort("firstDirect expected");
       // first(Suffix) -> first(Array) -> "[" 
-      if (firstSuffix.Contains(sym.kind)){
+      if (firstSuffix.Contains(sym.kind))
         Suffix();
-      else Abort("firstSuffix expected");
-      }
     }
 
     static void Suffix(){ 
@@ -298,7 +296,8 @@
 
     static void Params(){
       //Params = "(" [ OneParam { "," OneParam } ] ")" .
-      Accept(lParenSym, "( expected");
+      if (firstParams.Contains(sym.kind))
+        Accept(lParenSym, "( expected");
       // first(OneParam) -> identSym
       if (firstOneParam.Contains(sym.kind)){
         OneParam();
