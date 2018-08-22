@@ -169,7 +169,7 @@
 					else if(ch == '/'){
 						do{
 							GetChar();
-						}while(ch!='\n');
+						}while(ch!='\n' && ch!= EOF);
 						GetChar();
 						GetSym();
 						return;
