@@ -73,7 +73,6 @@
     // are not always a good thing
 
     static char ch;    // look ahead character for scanner
-
     static void GetChar() {
     // Obtains next character ch from input, or CHR(0) if EOF reached
     // Reflect ch to output
@@ -101,7 +100,8 @@
           do {
             symLex.Append(ch); 
             GetChar();
-          } while (Char.IsLetterOrDigit(ch));
+          } while (Char.IsLetterOrDigit(ch) || ch == '_'); // c++ actually only allows single underscore in identifier
+
           switch (symLex.ToString()){ // Check this works~!
             case "int":
               symKind = intSym;
@@ -166,6 +166,7 @@
       // over to you!
 
       sym = new Token(symKind, symLex.ToString());
+      Console.WriteLine(sym.val);
     } // GetSym
 
 
@@ -287,11 +288,12 @@
 
     static void Suffix(){ 
       //Suffix = Array { Array } | Params .
-      if (firstArray.Contains(sym.kind)){
+      if (sym.kind == lbrackSym){
         Array(); 
-        while (sym.kind == rbrackSym) Array();
+        while (sym.kind == lbrackSym) Array();
       }
-      else Params();
+      else if (sym.kind == lParenSym) Params();
+      else Abort("Suffix expected");
     }
 
     static void Params(){
@@ -317,7 +319,7 @@
     static void Array(){
       //Array = "[" [ number ] "]" .
       if (firstArray.Contains(sym.kind))
-        Accept(rbrackSym, "[ expected");
+        Accept(lbrackSym, "[ expected");
       if (sym.kind == numSym) Accept(numSym, "number expected");
       Accept(rbrackSym, "] expected");
     }
