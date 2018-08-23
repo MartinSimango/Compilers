@@ -3,8 +3,11 @@ using Library;
 COMPILER Calc  $CN
 /* Simple four function calculator with 26 memory cells
    P.D. Terry, Rhodes University, 2015 */
+   
+/* Louise Poole, Martin Simango, Matt Doherty */
 
   static double[] mem = new double[26];
+  static bool[] isAssigned = new bool[26];
 
 CHARACTERS
   digit      = "0123456789" .
@@ -18,11 +21,18 @@ IGNORE CHR(0) .. CHR(31)
 
 PRODUCTIONS
   Calc                               (. int index = 0; double value = 0.0;
-                                        for (int i = 0; i < 26; i++) mem[i] = 0.0; .)
+                                        for (int i = 0; i < 26; i++) {
+										mem[i] = 0.0; isAssigned[i] = false;
+										} .)
   = { Variable                       (. index = token.val[0] - 'A'; .)
-      "=" Expression<out value>      (. mem[index] = value;
-                                        IO.WriteLine(value); .)
-    } EOF .
+      "=" Expression<out value> ";"  (. mem[index] = value;
+                                        IO.WriteLine(value);
+                                        isAssigned[index] = true; .)
+      | "print" Expression<out value> ";" (. IO.WriteLine(value); .)
+    } EOF . /* ERROR RECOVERY: We'd add sync points to where ";" are found.
+	           If any errors are encountered during a line, the rest of the
+			   line can be skipped until the ";" and the program can continue
+			   to parse despite the previous error. */
 
   Expression<out double expVal>      (. double expVal1 = 0.0; .)
   = Term<out expVal>
@@ -31,11 +41,22 @@ PRODUCTIONS
     } .
 
   Term<out double termVal>           (. double termVal1 = 0.0; .)
-  = Factor<out termVal>
-    {   "*" Factor<out termVal1>     (. termVal *= termVal1; .)
-      | "/" Factor<out termVal1>     (. termVal /= termVal1; .)
+  = Root<out termVal>
+    {   "*" Root<out termVal1>       (. termVal *= termVal1; .)
+      | "/" Root<out termVal1>       (. if(termVal1 != 0) {
+										  termVal /= termVal1; 
+										  } else {
+										  SemError("cannot divide by 0");
+										  } .)
     } .
 
+  Root<out double rootVal>                     (. double rootVal1 = 0.0; rootVal = 0.0; .)
+  = Factor<out rootVal> 
+    |   "sqrt" "(" Expression<out rootVal> ")" (. rootVal = Math.Sqrt(rootVal);  .)
+	|   "max" "(" Expression<out rootVal> 
+		"," Expression<out rootVal1> ")"       (. rootVal = Math.Max(rootVal,rootVal1); .)
+	.
+	
   Factor<out double factVal>         (. factVal = 0.0; .)
   =   Number                         (. try {
                                           factVal = Convert.ToDouble(token.val);
@@ -43,7 +64,8 @@ PRODUCTIONS
                                           factVal = 0; SemError("number out of range");
                                         } .)
     | Variable                       (. int index = token.val[0] - 'A';
-                                        factVal = mem[index]; .)
+	                                    if(isAssigned[index]) factVal = mem[index];
+										else SemError(token.val[0]+" not defined"); .)
     | "(" Expression<out factVal> ")"
     .
 
