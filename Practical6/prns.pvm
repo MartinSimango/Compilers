@@ -1,0 +1,7 @@
+ASSEM
+BEGIN
+   LDC  100
+PRNS "\n\ta\t\\\z\x"
+   prni
+         HALT
+END.

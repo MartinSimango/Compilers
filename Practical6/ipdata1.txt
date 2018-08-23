@@ -1,0 +1,8 @@
+146.231.122.131   bungee.ru.ac.za       #comments appear like this
+146.231.128.6     terrapin.ru.ac.za
+146.231.56.10     thistle-sp.ru.ac.za
+147.28.0.62       psg.com
+147.28.0.67       psg.com
+146.231.122.1123  pdt1.ict.ru.ac.za     #invalid IP address
+146.231.122.156   pdt2.ict.ru.ac.za
+146.231.122.156   pdt3.ict.ru.ac.za     #non-unique IP address

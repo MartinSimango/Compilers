@@ -1,0 +1,52 @@
+using Library;
+using System.Collections.Generic;
+
+COMPILER Check3 $CN
+// Put your names and a description here
+// This version uses parameters
+
+IGNORECASE
+
+CHARACTERS
+  digit   = "0123456789" .
+  letter  = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" .
+  eol     = CHR(10) .
+
+TOKENS
+  number = digit { digit } .
+  name   = letter { letter | digit | "." | "-" } .
+
+COMMENTS FROM "#" TO eol
+
+IGNORE CHR(0) .. CHR(31)
+
+PRODUCTIONS
+  Check3                        (. List<int> IPList = new List<int> (); .)
+  =
+  { Entry<IPList> }
+  EOF                           (. if (Successful()) IO.WriteLine("all correct"); .)
+  .
+
+  Entry<. List<int> IPL .>
+  = IPNumber<IPL> name .
+
+  IPNumber<. List<int> IPL .>
+  =                             (. int n, m; .)
+  Number<out n>
+  "." Number<out m>             (. n = 256 * n + m; .)
+  "." Number<out m>             (. n = 256 * n + m; .)
+  "." Number<out m>             (. n = 256 * n + m;
+                                   if (IPL.Contains(n)) SemError("duplicate IP number");
+                                   else IPL.Add(n); .)
+  .
+
+  Number<out int n>
+  =  number                     (. try {
+                                     n = Convert.ToInt32(token.val);
+                                   } catch (Exception) {
+                                     n = 256;
+                                   }
+                                   if (n > 255) SemError("number too large"); .)
+  .
+
+END Check3.
