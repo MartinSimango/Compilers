@@ -103,7 +103,7 @@
             {
                 symLex.Append(ch);
                 GetChar();
-            } while (Char.IsLetterOrDigit(ch));
+            } while (Char.IsLetterOrDigit(ch) || ch=='_');
 
             if (symLex.ToString().Equals("int")) symKind = intSym;
             else if (symLex.ToString().Equals("char")) symKind = charSym;
@@ -169,7 +169,7 @@
 					else if(ch == '/'){
 						do{
 							GetChar();
-						}while(ch!='\n');
+						}while(ch!='\n' && ch!= EOF);
 						GetChar();
 						GetSym();
 						return;
@@ -185,23 +185,112 @@
       sym = new Token(symKind, symLex.ToString());
     } // GetSym
 
-  /*  ++++ Commented out for the moment
 
     // +++++++++++++++++++++++++++++++ Parser +++++++++++++++++++++++++++++++++++
-
+    static IntSet 
+      firstDecList = new IntSet(intSym, voidSym, boolSym, charSym),
+      firstType = new IntSet(intSym, voidSym, boolSym, charSym),
+      firstOneDecl = new IntSet(pointerSym, identSym, lParenSym),
+      firstDirect = new IntSet(identSym, lParenSym),
+      firstSuffix = new IntSet(lbrackSym, lParenSym),
+      firstParams = new IntSet(lParenSym),
+      firstOneParam = new IntSet(intSym, voidSym, boolSym, charSym),
+      firstArray = new IntSet(lbrackSym);
     static void Accept(int wantedSym, string errorMessage) {
     // Checks that lookahead token is wantedSym
-      if (sym.kind == wantedSym) GetSym(); else Abort(errorMessage);
+      if (sym.kind == wantedSym) 
+		  GetSym(); 
+	  else 
+		  Abort(errorMessage);
     } // Accept
 
     static void Accept(IntSet allowedSet, string errorMessage) {
     // Checks that lookahead token is in allowedSet
-      if (allowedSet.Contains(sym.kind)) GetSym(); else Abort(errorMessage);
+      if (allowedSet.Contains(sym.kind)) 
+		  GetSym(); 
+	  else 
+		  Abort(errorMessage);
     } // Accept
 
-    static void CDecls() {}
-
-  ++++++ */
+    static void CDecls() {
+		 while (firstDecList.Contains(sym.kind)) DecList();
+		 Accept(EOFSym, "EOF expected");
+	}
+	static void DecList(){
+		Type();
+		OneDecl();
+		while (sym.kind == commaSym){
+			Accept(commaSym, ", expected");
+		    OneDecl();
+		}
+		Accept(semiColonSym, "; expected");
+		
+	}
+	static void Type(){
+		Accept(sym.kind, sym.val+ " expected");
+		
+	}
+	
+	static void OneDecl(){
+		if(sym.kind ==pointerSym){
+			Accept(pointerSym,"* expected");
+			OneDecl();
+		}
+		else if(firstDirect.Contains(sym.kind)){
+			Direct();
+		}
+		else{ 
+			Abort("Invalid start to OneDecl");
+		}
+		
+			
+	}
+		
+    static void Direct(){
+			if(sym.kind == identSym)
+				Accept(identSym, "identifier expected");
+			else if(sym.kind == lParenSym) {
+				Accept(lParenSym,"( expected");
+				OneDecl();
+				Accept(rParenSym,") expected " );
+			}
+			if(firstSuffix.Contains(sym.kind)){
+				Suffix();
+			}
+			
+	}
+	static void Suffix(){
+		if(firstArray.Contains(sym.kind)){
+			Array();
+			while(firstArray.Contains(sym.kind)) Array();
+		}
+		else if (firstParams.Contains(sym.kind)) Params();
+		
+	}
+	static void Params(){
+		Accept(lParenSym,"( expected");
+		if(firstOneParam.Contains(sym.kind)){
+			OneParam();
+			while(sym.kind == commaSym){
+				Accept(commaSym,", expected");
+				OneParam();
+			}
+		}
+		Accept(rParenSym,") expected");
+	}
+	static void OneParam(){
+		Type();
+		if(firstOneDecl.Contains(sym.kind)){
+			OneDecl();
+		}
+	}
+	static void Array(){
+		Accept(lbrackSym,"[ expected");
+		if(sym.kind == numSym){
+			Accept(numSym,"numSym expected");
+		}
+		Accept(rbrackSym,"] expected");
+	}
 
     // +++++++++++++++++++++ Main driver function +++++++++++++++++++++++++++++++
 
@@ -218,20 +307,20 @@
 
   //  To test the scanner we can use a loop like the following:
 
-      do {
+    /*  do {
         GetSym();                                 // Lookahead symbol
         OutFile.StdOut.Write(sym.kind, 3);
         OutFile.StdOut.WriteLine(" " + sym.val);  // See what we got
       } while (sym.kind != EOFSym);
-
-  /*  After the scanner is debugged we shall substitute this code:
+*/
+   // After the scanner is debugged we shall substitute this code:
 
       GetSym();                                   // Lookahead symbol
       CDecls();                                   // Start to parse from the goal symbol
       // if we get back here everything must have been satisfactory
       Console.WriteLine("Parsed correctly");
 
-  */
+  
       output.Close();
     } // Main
 
