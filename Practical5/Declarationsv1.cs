@@ -224,39 +224,34 @@
 		    OneDecl();
 		}
 		Accept(semiColonSym, "; expected");
-		
 	}
 	static void Type(){
-		Accept(sym.kind, sym.val+ " expected");
-		
+		Accept(firstType, "type expected");		
 	}
 	
 	static void OneDecl(){
-		if(sym.kind ==pointerSym){
+		if(sym.kind == pointerSym){
 			Accept(pointerSym,"* expected");
 			OneDecl();
 		}
-		else if(firstDirect.Contains(sym.kind)){
+		else {
 			Direct();
 		}
-		else{ 
-			Abort("Invalid start to OneDecl");
-		}
-		
-			
+	
 	}
 		
     static void Direct(){
-			if(sym.kind == identSym)
-				Accept(identSym, "identifier expected");
-			else if(sym.kind == lParenSym) {
-				Accept(lParenSym,"( expected");
-				OneDecl();
-				Accept(rParenSym,") expected " );
-			}
-			if(firstSuffix.Contains(sym.kind)){
-				Suffix();
-			}
+		if(sym.kind == lParenSym) {
+			Accept(lParenSym,"( expected");
+			OneDecl();
+			Accept(rParenSym,") expected " );
+		}
+		else{
+			Accept(identSym, "identifier expected");
+		}
+		if(firstSuffix.Contains(sym.kind)){
+			Suffix();
+		}
 			
 	}
 	static void Suffix(){
@@ -264,7 +259,9 @@
 			Array();
 			while(firstArray.Contains(sym.kind)) Array();
 		}
-		else if (firstParams.Contains(sym.kind)) Params();
+		else {
+			 Params();
+		}
 		
 	}
 	static void Params(){
