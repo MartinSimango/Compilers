@@ -21,14 +21,17 @@ COMMENTS FROM "#" TO eol
 IGNORE CHR(0) .. CHR(31)
 
 PRODUCTIONS
-  Check3                        (. List<int> IPList = new List<int> (); .)
+  Check3                        (. List<int> IPList = new List<int> (); 
+                                   List<string> hostList = new List<string> (); .)
   =
-  { Entry<IPList> }
+  { Entry<IPList, hostList> }
   EOF                           (. if (Successful()) IO.WriteLine("all correct"); .)
   .
 
-  Entry<. List<int> IPL .>
-  = IPNumber<IPL> name .
+  Entry<. List<int> IPL, List<string> hList .>         (. string host = "empty"; .)
+  = IPNumber<IPL> Name<out host> { Name<out host> }    (. if (hList.Contains(host)) SemError("Dublicate host");
+                                                          else hList.Add(host); .)      
+  .
 
   IPNumber<. List<int> IPL .>
   =                             (. int n, m; .)
@@ -38,6 +41,10 @@ PRODUCTIONS
   "." Number<out m>             (. n = 256 * n + m;
                                    if (IPL.Contains(n)) SemError("duplicate IP number");
                                    else IPL.Add(n); .)
+  .
+
+  Name<out string host>  
+  = name                        (. host = token.val; .) 
   .
 
   Number<out int n>
