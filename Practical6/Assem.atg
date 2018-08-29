@@ -44,11 +44,13 @@ PRODUCTIONS
   = (   "ADD"  | "AND"  | "ANEW" | "CEQ"  | "CGE"  | "CGT"  | "CLE"  | "CLT"
       | "CNE"  | "DIV"  | "HALT" | "INPB" | "INPI" | "LDV"  | "LDXA" | "MUL"
       | "NEG"  | "NOP"  | "NOT"  | "OR"   | "PRNB" | "PRNI" | "PRNL" | "REM"
-      | "STO"  | "SUB" )         (. CodeGen.OneWord(token.val); .)
+      | "STO"  | "SUB"  | "INC"  | "DEC"  | "LDL_1"| "LDL_2"| "LDL_3"| "LDL_0"
+      | "LDC_0"| "LDC_1"| "LDC_2"| "LDC_3"| "LDA_0"| "LDA_1"| "LDA_2"| "LDA_3"
+      | "STL_0"| "STL_1"| "STL_2"| "STL_3" ) (. CodeGen.OneWord(token.val); .)
   .
 
   TwoWord                        (. int value; .)
-  = ( "DSP" | "LDC" | "LDA" )    (. string mnemonic = token.val; .)
+  = ( "DSP" | "LDC" | "LDA" | "LDL" | "LDC" | "LDA" | "STL" )    (. string mnemonic = token.val; .)
     Number<out value>            (. CodeGen.TwoWord(mnemonic, value); .)
   .
 
