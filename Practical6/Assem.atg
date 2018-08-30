@@ -49,17 +49,20 @@ PRODUCTIONS
       | "STL_0"| "STL_1"| "STL_2"| "STL_3" ) (. CodeGen.OneWord(token.val); .)
   .
 
-  TwoWord                        (. int value; .)
-  = ( "DSP" | "LDC" | "LDA" | "LDL" | "LDC" | "LDA" | "STL" )    (. string mnemonic = token.val; .)
-    Number<out value>            (. CodeGen.TwoWord(mnemonic, value); .)
+  TwoWord                                        (. int value; .)
+  = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val; .)
+      Number<out value>   (. CodeGen.TwoWord(mnemonic, value); .)
   .
 
   Number<out int value>
-  = number                       (. try {
+  = (number                          (. try {
                                       value = Convert.ToInt32(token.val);
                                     } catch (Exception ) {
                                       value = 0; SemError("number too large");
                                     } .)
+   | identifier)                   (. string name = token.val;
+                                    int offset = VarTable.FindOffset(name);
+                                    value = offset; .)
   .
 
   WriteString                    (. string str; .)
@@ -80,6 +83,11 @@ PRODUCTIONS
                                     else entry.label.Here(); .)
   .
 
+//  Variable<out int value>
+//  = identifier                   (. string name = token.val;
+//                                    int offset = VarTable.FindOffset(name);
+//                                    value = offset; .)
+//  .
   Branch                         (. int target;
                                     string name;
                                     Label lab; .)
