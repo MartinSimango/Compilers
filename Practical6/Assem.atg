@@ -51,19 +51,18 @@ PRODUCTIONS
 
   TwoWord                                        (. int value; .)
   = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val; .)
-      Number<out value>   (. CodeGen.TwoWord(mnemonic, value); .)
-  .
+      (Number<out value>   (. CodeGen.TwoWord(mnemonic, value); .)
+       | Variable <out value> (. CodeGen.TwoWord(mnemonic, value); .)
+
+  ).
 
   Number<out int value>
-  = (number                          (. try {
+  = (number                         (. try {
                                       value = Convert.ToInt32(token.val);
                                     } catch (Exception ) {
-                                      value = 0; SemError("number too large");
+                                      value = 0; SemError("Not a ident");
                                     } .)
-   | identifier)                   (. string name = token.val;
-                                    int offset = VarTable.FindOffset(name);
-                                    value = offset; .)
-  .
+    ) .
 
   WriteString                    (. string str; .)
   = "PRNS" StringConst<out str>  (. CodeGen.WriteString(str); .)
@@ -83,11 +82,11 @@ PRODUCTIONS
                                     else entry.label.Here(); .)
   .
 
-//  Variable<out int value>
-//  = identifier                   (. string name = token.val;
-//                                    int offset = VarTable.FindOffset(name);
-//                                    value = offset; .)
-//  .
+  Variable<out int value>
+  = identifier                   (. string name = token.val;
+                                    int offset = VarTable.FindOffset(name);
+                                    value = offset; .)
+  .
   Branch                         (. int target;
                                     string name;
                                     Label lab; .)
