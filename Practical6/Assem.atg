@@ -34,7 +34,8 @@ PRODUCTIONS
   Assem
   = "ASSEM" "BEGIN"
        { Statement }
-    "END" "."                    (. LabelTable.CheckLabels(); .)
+    "END" "."                    (. LabelTable.CheckLabels(); 
+                                    LabelTable.ListReferences(pretty); .)
     .
 
   Statement
@@ -75,8 +76,12 @@ PRODUCTIONS
   Label
   = label                        (. string name = token.val.Substring(0, token.val.Length - 1).ToLower();
                                     LabelEntry entry = LabelTable.Find(name);
-                                    if (entry == null)
-                                      LabelTable.Insert(new LabelEntry(name, new Label(known)));
+                                    //IO.WriteLine(name);
+                                    if (entry == null){
+                                      Label lab = new Label(!known);
+                                      int labAdr = lab.Address();
+                                      LabelTable.Insert(new LabelEntry(name, lab, labAdr));
+                                    }
                                     else if (entry.label.IsDefined())
                                       SemError("redefined label");
                                     else entry.label.Here(); .)
@@ -95,9 +100,12 @@ PRODUCTIONS
       | Ident<out name>          (. LabelEntry entry = LabelTable.Find(name);
                                     if (entry == null) {
                                       lab = new Label(!known);
-                                      LabelTable.Insert(new LabelEntry(name, lab));
+                                      int labAdr = lab.Address();
+                                      LabelTable.Insert(new LabelEntry(name, lab, labAdr));
                                     }
-                                    else lab = entry.label;
+                                    else {
+                                      lab = entry.label;
+                                    }
                                     CodeGen.Branch(mnemonic, lab); .)
     ) .
 

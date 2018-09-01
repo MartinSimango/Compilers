@@ -10,10 +10,17 @@ namespace Assem {
 
     public string name;
     public Label label;
+    public List<int> refs;
 
-    public LabelEntry(string name, Label label) {
+    public LabelEntry(string name, Label label, int lineNumber) {
       this.name  = name;
-      this.label = label;
+      this.label = label; 
+      this.refs = new List<int>();
+      this.refs.Add(lineNumber);
+    }
+
+    public void AddReference(int lineNumber) {
+      this.refs.Add(lineNumber);
     }
 
   } // end LabelEntry
@@ -22,7 +29,7 @@ namespace Assem {
 
   class LabelTable {
 
-    private static List<LabelEntry> list = new List<LabelEntry>();
+    public static List<LabelEntry> list = new List<LabelEntry>();
 
     public static void Insert(LabelEntry entry) {
     // Inserts entry into label table
@@ -34,7 +41,16 @@ namespace Assem {
     // If not found, returns null
       int i = 0;
       while (i < list.Count && !name.Equals(list[i].name)) i++;
-      if (i >= list.Count) return null; else return list[i];
+      if (i >= list.Count){ 
+        return null; 
+      } 
+      else{
+        LabelEntry entryFound = list[i];
+        int labAdr = entryFound.label.Address();
+        entryFound.AddReference(labAdr);
+        list[i] = entryFound;
+        return list[i];
+      }
     } // find
 
     public static void CheckLabels() {
@@ -42,12 +58,24 @@ namespace Assem {
       for (int i = 0; i < list.Count; i++) {
         if (!list[i].label.IsDefined())
           Parser.SemError("undefined label - " + list[i].name);
+        else {
+          Parser.SemError("This object");
+          //list[i].AddReference(list[i].label.Address());
+        }
       }
     } // CheckLabels
 
     public static void ListReferences(OutFile output) {
     // Cross reference list of all labels used on output file
-
+      IO.WriteLine("Labels:");
+      for (int i = 0; i < list.Count; i++){
+        string reflist = list[i].name;
+        if (list[i].label.IsDefined())
+          reflist += "  (DEFINED) ";
+        foreach (int r in list[i].refs)
+            reflist += " " + r;
+        IO.WriteLine(reflist);
+      }
     } // ListReferences
 
   } // end LabelTable
@@ -76,7 +104,14 @@ namespace Assem {
     public static int FindOffset(string name) {
     // Searches table for variable entry matching name.  If found then returns the known offset.
     // If not found, makes an entry and updates the master offset
-      return 0;    // dummy for initial testing
+      int i = 0;
+      while (i < list.Count && !name.Equals(list[i].name)) i++;      
+      if (i >= list.Count) { 
+        list.Add(new VariableEntry(name, i)); 
+        varOffset = i; 
+        return i;
+      }
+      else return i;
     } // FindOffset
 
     public static void ListReferences(OutFile output) {
