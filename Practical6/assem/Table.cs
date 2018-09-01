@@ -11,12 +11,12 @@ namespace Assem {
 
     public string name;
     public Label label;
-    public List<Int32> refs = null;
+    public List<int> refs = null;
 
     public LabelEntry(string name, Label label, int lineNumber) {
       this.name  = name;
       this.label = label; 
-      this.refs = new List<Int32> ();
+      this.refs = new List<int> ();
       this.refs.Add(lineNumber);
     }
 
@@ -84,10 +84,17 @@ namespace Assem {
 
     public string name;
     public int offset;
+    public List<int> refs = null;
 
-    public VariableEntry(string name, int offset) {
+    public VariableEntry(string name, int offset, int lineNumber) {
       this.name   = name;
       this.offset = offset;
+      refs = new List<int>();
+      this.refs.Add(lineNumber);
+    }
+
+    public void AddReference(int lineNumber) {
+      this.refs.Add(lineNumber);
     }
 
   } // end VariableEntry
@@ -105,16 +112,29 @@ namespace Assem {
       int i = 0;
       while (i < list.Count && !name.Equals(list[i].name)) i++;      
       if (i >= list.Count) { 
-        list.Add(new VariableEntry(name, i)); 
+        list.Add(new VariableEntry(name, i, i)); 
         varOffset = i; 
         return i;
       }
-      else return i;
+      else {
+        VariableEntry entryFound = list[i];
+        int varAdr = CodeGen.GetCodeLength();
+        entryFound.AddReference(varAdr);
+        list[i] = entryFound;
+        return i;
+      }
     } // FindOffset
 
     public static void ListReferences(OutFile output) {
     // Cross reference list of all variables on output file
-
+      IO.WriteLine("\nVariables:");
+      for (int i = 0; i < list.Count; i++){
+        string reflist = list[i].name;
+        reflist += "  - OFFSET ";
+        foreach (int r in list[i].refs)
+            reflist += " " + r;
+        IO.WriteLine(reflist);
+      }
     } // ListReferences
 
   } // end VarTable

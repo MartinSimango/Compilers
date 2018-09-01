@@ -35,7 +35,8 @@ PRODUCTIONS
   = "ASSEM" "BEGIN"
        { Statement }
     "END" "."                    (. LabelTable.CheckLabels(); 
-                                    LabelTable.ListReferences(pretty); .)
+                                    LabelTable.ListReferences(pretty); 
+                                    VarTable.ListReferences(pretty); .)
     .
 
   Statement
