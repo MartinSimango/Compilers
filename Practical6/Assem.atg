@@ -76,10 +76,9 @@ PRODUCTIONS
   Label
   = label                        (. string name = token.val.Substring(0, token.val.Length - 1).ToLower();
                                     LabelEntry entry = LabelTable.Find(name);
-                                    //IO.WriteLine(name);
                                     if (entry == null){
-                                      Label lab = new Label(!known);
-                                      int labAdr = lab.Address();
+                                      Label lab = new Label(known);
+                                      int labAdr = CodeGen.GetCodeLength();
                                       LabelTable.Insert(new LabelEntry(name, lab, labAdr));
                                     }
                                     else if (entry.label.IsDefined())
@@ -100,8 +99,8 @@ PRODUCTIONS
       | Ident<out name>          (. LabelEntry entry = LabelTable.Find(name);
                                     if (entry == null) {
                                       lab = new Label(!known);
-                                      int labAdr = lab.Address();
-                                      LabelTable.Insert(new LabelEntry(name, lab, labAdr));
+                                      int labAdr = CodeGen.GetCodeLength();
+                                      LabelTable.Insert(new LabelEntry(name, lab, -labAdr));
                                     }
                                     else {
                                       lab = entry.label;

@@ -2,6 +2,7 @@
 // P.D. Terry, Rhodes University, 2015
 
 using Library;
+using System;
 using System.Collections.Generic;
 
 namespace Assem {
@@ -10,12 +11,12 @@ namespace Assem {
 
     public string name;
     public Label label;
-    public List<int> refs;
+    public List<Int32> refs = null;
 
     public LabelEntry(string name, Label label, int lineNumber) {
       this.name  = name;
       this.label = label; 
-      this.refs = new List<int>();
+      this.refs = new List<Int32> ();
       this.refs.Add(lineNumber);
     }
 
@@ -40,13 +41,14 @@ namespace Assem {
     // Searches table for label entry matching name.  If found then returns entry.
     // If not found, returns null
       int i = 0;
+      //IO.WriteLine(list.Count);
       while (i < list.Count && !name.Equals(list[i].name)) i++;
       if (i >= list.Count){ 
         return null; 
       } 
       else{
         LabelEntry entryFound = list[i];
-        int labAdr = entryFound.label.Address();
+        int labAdr = CodeGen.GetCodeLength();
         entryFound.AddReference(labAdr);
         list[i] = entryFound;
         return list[i];
@@ -58,10 +60,6 @@ namespace Assem {
       for (int i = 0; i < list.Count; i++) {
         if (!list[i].label.IsDefined())
           Parser.SemError("undefined label - " + list[i].name);
-        else {
-          Parser.SemError("This object");
-          //list[i].AddReference(list[i].label.Address());
-        }
       }
     } // CheckLabels
 
