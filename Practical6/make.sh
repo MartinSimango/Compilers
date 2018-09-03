@@ -8,7 +8,7 @@ then
 fi
 
 # Compile the file 
-mcs $1.cs Parser.cs Scanner.cs Library.cs
+mcs $1.cs Parser.cs Scanner.cs assem/CodeGen.cs assem/PVM.cs assem/Table.cs Library.cs
 
 if [ $? -eq 0 ]
 then 
