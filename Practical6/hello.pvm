@@ -1,0 +1,7 @@
+ASSEM
+BEGIN
+;  Every language has one!
+        PRNS "Hello world"
+        PRNL
+        HALT
+END.
