@@ -28,9 +28,17 @@ PRODUCTIONS
   EOF                           (. if (Successful()) IO.WriteLine("all correct"); .)
   .
 
-  Entry<. List<int> IPL, List<string> hList .>         (. string host = "empty"; .)
-  = IPNumber<IPL> Name<out host> { Name<out host> }    (. if (hList.Contains(host)) SemError("Dublicate host");
-                                                          else hList.Add(host); .)      
+  Entry<. List<int> IPL, List<string> hList .>         (. string host; .)   
+  = IPNumber<IPL> 
+  Name<out host> 	    (. if (hList.Contains(host)) 
+								SemError("Dublicate host " + host);
+                            else 
+								hList.Add(host); .)   
+ {Name<out host>       (. if (hList.Contains(host)) 
+								SemError("Dublicate host " + host);
+                             else 
+								hList.Add(host); .)   
+}
   .
 
   IPNumber<. List<int> IPL .>
@@ -39,7 +47,7 @@ PRODUCTIONS
   "." Number<out m>             (. n = 256 * n + m; .)
   "." Number<out m>             (. n = 256 * n + m; .)
   "." Number<out m>             (. n = 256 * n + m;
-                                   if (IPL.Contains(n)) SemError("duplicate IP number");
+                                   if (IPL.Contains(n)) SemError("duplicate IP number ");
                                    else IPL.Add(n); .)
   .
 
@@ -53,7 +61,9 @@ PRODUCTIONS
                                    } catch (Exception) {
                                      n = 256;
                                    }
-                                   if (n > 255) SemError("number too large"); .)
+                                   if (n > 255) SemError("number too large " + n); .)
   .
 
 END Check3.
+
+
