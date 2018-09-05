@@ -17,38 +17,49 @@ CHARACTERS
   letter     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" .
   digit      = "0123456789" .
   stringCh   = ANY - '"' - control .
+  printable  = CHR(0) .. CHR(255) - lf .
 
 TOKENS
   identifier = letter { letter | digit } .
   number     = [ '+' | '-' ] digit { digit } .
   label      = letter { letter | digit } ":" .
   stringLit  = '"' { stringCh } '"' .
+  Comment    = ";" { printable } . 
+  EOL 		 = lf .
+  
 
 COMMENTS FROM "{" TO "}"
-COMMENTS FROM ";" TO lf
+COMMENTS FROM ";" TO lf 
 
-IGNORE CHR(9) .. CHR(13)
+IGNORE CHR(9) .. CHR(13) - lf
 
 
 PRODUCTIONS
-  Assem
-  = "ASSEM" "BEGIN"
-       { Statement }
-    "END" "."                    (. LabelTable.CheckLabels(); 
+  Assem = "ASSEM" EOL "BEGIN" EOL (. IO.WriteLine("ASSEM\nBEGIN\n"); .)
+     { Statement }
+    "END" "." { EOL }            (. LabelTable.CheckLabels(); 
 	                                LabelTable.ListReferences(pretty);
 								    VarTable.ListReferences(pretty);
 								 .)
     .
-
-  Statement
-  = OneWord | TwoWord | WriteString | Label | Branch .
+     
+  Statement                      (. bool hasLabel = false; .)
+  = [  Label                     (. IO.Write(token.val);
+                                    hasLabel = true;  .)
+      ]                     
+     [ OneWord                   (. if(!hasLabel){
+	                                IO.Write("",9);
+									} else IO.Write("",3);
+	                                IO.Write(token.val); .)
+	  | TwoWord | WriteString | Branch ] [ Comment ] EOL (. IO.WriteLine(); .)
+	  .
 
   OneWord
   = (   "ADD"  | "AND"  | "ANEW" | "CEQ"  | "CGE"  | "CGT"  | "CLE"  | "CLT"
       | "CNE"  | "DIV"  | "HALT" | "INPB" | "INPI" | "LDV"  | "LDXA" | "MUL"
       | "NEG"  | "NOP"  | "NOT"  | "OR"   | "PRNB" | "PRNI" | "PRNL" | "REM"
-      | "STO"  | "SUB" | "INC" | "DEC"    | "LDL_0"| "LDL_1" | "LDL_2"| "LDL_3"  
-	  |"LDC_0" | "LDC_1"| "LDC_2"| "LDC_3"| "LDA_0"| "LDA_1"| "LDA_2"| "LDA_3"
+      | "STO"  | "SUB"  | "INC"  | "DEC"  | "LDL_0"| "LDL_1"| "LDL_2"| "LDL_3"  
+	  | "LDC_0"| "LDC_1"| "LDC_2"| "LDC_3"| "LDA_0"| "LDA_1"| "LDA_2"| "LDA_3"
       | "STL_0"| "STL_1"| "STL_2"| "STL_3"  )  (. CodeGen.OneWord(token.val); .)
   .
 
