@@ -72,6 +72,33 @@ namespace Assem {
         return;
       }
       for (int i = 0; i < l; i++) {
+		  if (str[i]=='\\'){
+			 if(i+1<l){
+				 switch(str[i+1]){
+					 case 'n':		 
+					 PVM.mem[--stkTop]= '\n';
+					 i++;
+					 continue;
+					 case 't':
+					 PVM.mem[--stkTop]= '\t';
+					 i++;
+					 continue;
+					 case  'f':
+					 PVM.mem[--stkTop]= '\f';
+					 i++;
+					 continue;
+					 case '"':
+					 PVM.mem[--stkTop]= '\"';
+					 i++;
+					 continue;
+					 case '\'':
+					 PVM.mem[--stkTop]= '\'';
+					 i++;
+					 continue;
+					 
+				 }
+			 }
+		  }
         stkTop--; PVM.mem[stkTop] = str[i];
       }
       stkTop--; PVM.mem[stkTop] = 0;
