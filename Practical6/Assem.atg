@@ -47,7 +47,9 @@ PRODUCTIONS
 		   "BEGIN" (. IO.Write("BEGIN"); .) 
 		 [Comment (. IO.Write("",CommentColWidth-5); IO.WriteLine(token.val); .) ] EOL  //Comment on the same line as BEGIN
      { Statement }
-    "END" "." { EOL }            (. 
+    "END" "." (. IO.Write("END."); .)  [Comment (. IO.Write("",CommentColWidth-4); IO.WriteLine(token.val); .) ] EOL //comments same line as END.
+    
+	{ [Comment (. IO.Write("",CommentColWidth); IO.WriteLine(token.val); .)] EOL  }            (. 
 									LabelTable.CheckLabels(); 
 	                                IO.WriteLine();
 									LabelTable.ListReferences(pretty);
