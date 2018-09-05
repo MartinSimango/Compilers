@@ -193,18 +193,17 @@ public class Parser {
 	}
 
 	static void Statement() {
-		bool hasLabel = false;
+		bool hasLabel = true;
 		if (la.kind == label_Sym) {
 			Label();
 			IO.Write(token.val);
 			hasLabel = true;
+			IO.Write("", 15-token.val.Length);
 		}
 		if (StartOf(2)) {
 			if (StartOf(3)) {
+				if(!hasLabel) IO.Write("",15);
 				OneWord();
-				if(!hasLabel){
-				IO.Write("",9);
-				} else IO.Write("",3);
 				IO.Write(token.val);
 			} else if (StartOf(4)) {
 				TwoWord();
@@ -436,9 +435,11 @@ public class Parser {
 			Get();
 		} else SynErr(65);
 		string mnemonic = token.val;
+		IO.Write(token.val);
 		if (la.kind == number_Sym) {
 			Number(out value);
 			CodeGen.TwoWord(mnemonic, value);
+				
 		} else if (la.kind == identifier_Sym) {
 			Variable(out value);
 			CodeGen.TwoWord(mnemonic,value);

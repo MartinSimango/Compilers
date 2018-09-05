@@ -43,15 +43,14 @@ PRODUCTIONS
 								 .)
     .
      
-  Statement                      (. bool hasLabel = false; .)
+  Statement                      (. bool hasLabel = true; .)
   = [  Label                     (. IO.Write(token.val);
-                                    hasLabel = true;  .)
-      ]                     
-     [ OneWord                   (. if(!hasLabel){
-	                                IO.Write("",9);
-									} else IO.Write("",3);
-	                                IO.Write(token.val); .)
-	  | TwoWord | WriteString | Branch ] [ Comment ] EOL (. IO.WriteLine(); .)
+                                    hasLabel = true;
+                                    IO.Write("", (15-token.val.Length)); .)
+      ]
+     [OneWord                   (. IO.Write(token.val); .)
+	  | TwoWord
+	  | WriteString | Branch ] [ Comment ] EOL (. IO.WriteLine(); .)
 	  .
 
   OneWord
@@ -64,8 +63,10 @@ PRODUCTIONS
   .
 
   TwoWord                        (. int value; .)
-  = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val; .)
-     (Number<out value>            (. CodeGen.TwoWord(mnemonic, value); .)
+  = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val;
+                                                    IO.Write(token.val); .)
+     (Number<out value>            (. CodeGen.TwoWord(mnemonic, value);
+                                      	 .)
 	
 	| Variable<out value>   (. CodeGen.TwoWord(mnemonic,value); .)
     	
