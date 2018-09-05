@@ -65,7 +65,7 @@ namespace Assem {
 
     public static void ListReferences(OutFile output) {
     // Cross reference list of all labels used on output file
-      IO.WriteLine("Labels:");
+      IO.WriteLine("Labels:\n");
       for (int i = 0; i < list.Count; i++){
         string reflist = list[i].name;
         if (list[i].label.IsDefined())
@@ -125,7 +125,7 @@ namespace Assem {
 
     public static void ListReferences(OutFile output) {
     // Cross reference list of all variables on output file
-      IO.WriteLine("\nVariables:");
+      IO.WriteLine("\nVariables:\n");
       for (int i = 0; i < list.Count; i++){
         string reflist = list[i].name;
         reflist += "  - OFFSET ";
