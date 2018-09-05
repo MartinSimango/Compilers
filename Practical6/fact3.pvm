@@ -35,6 +35,7 @@ EXIT2:  LDL_0
         ADD
         STL_0          ;   n = n + 1;
         BRN    WHILE1  ; }
+		BRN    5
 EXIT1:  HALT
 END.
 

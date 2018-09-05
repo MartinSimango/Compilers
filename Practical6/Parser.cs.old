@@ -193,18 +193,19 @@ public class Parser {
 	}
 
 	static void Statement() {
-		bool hasLabel = true;
+		bool hasLabel = false;
 		if (la.kind == label_Sym) {
 			Label();
 			IO.Write(token.val);
 			hasLabel = true;
-			IO.Write("", 15-token.val.Length);
+			IO.Write("", (15-token.val.Length));
 		}
+		if(!hasLabel) IO.Write("",15);
 		if (StartOf(2)) {
 			if (StartOf(3)) {
-				if(!hasLabel) IO.Write("",15);
 				OneWord();
 				IO.Write(token.val);
+				IO.Write("",18-token.val.Length);
 			} else if (StartOf(4)) {
 				TwoWord();
 			} else if (la.kind == prns_Sym) {
@@ -215,6 +216,7 @@ public class Parser {
 		}
 		if (la.kind == Comment_Sym) {
 			Get();
+			IO.Write(token.val);
 		}
 		Expect(EOL_Sym);
 		IO.WriteLine();
@@ -436,10 +438,10 @@ public class Parser {
 		} else SynErr(65);
 		string mnemonic = token.val;
 		IO.Write(token.val);
+		IO.Write("",8-token.val.Length);
 		if (la.kind == number_Sym) {
 			Number(out value);
 			CodeGen.TwoWord(mnemonic, value);
-				
 		} else if (la.kind == identifier_Sym) {
 			Variable(out value);
 			CodeGen.TwoWord(mnemonic,value);
@@ -451,6 +453,10 @@ public class Parser {
 		Expect(prns_Sym);
 		StringConst(out str);
 		CodeGen.WriteString(str);
+		IO.Write("PRNS");
+		IO.Write("",4);
+		IO.Write(token.val);
+		IO.Write("",10-token.val.Length);
 	}
 
 	static void Branch() {
@@ -463,9 +469,12 @@ public class Parser {
 			Get();
 		} else SynErr(67);
 		string mnemonic = token.val;
+		IO.Write(token.val);
+		IO.Write("",5);
+		
 		if (la.kind == number_Sym) {
 			Number(out target);
-			CodeGen.TwoWord(mnemonic, target);
+			CodeGen.TwoWord(mnemonic, target);	
 		} else if (la.kind == identifier_Sym) {
 			Ident(out name);
 			LabelEntry entry = LabelTable.Find(name);
@@ -478,6 +487,8 @@ public class Parser {
 			lab = entry.label;
 			entry.AddReference(token.line);
 			}
+			IO.Write(name);
+			IO.Write("",10-name.Length);
 			CodeGen.Branch(mnemonic, lab);
 		} else SynErr(68);
 	}
@@ -485,6 +496,8 @@ public class Parser {
 	static void Number(out int value) {
 		Expect(number_Sym);
 		try {
+		  IO.Write(token.val);
+		IO.Write("",10-token.val.Length);
 		  value = Convert.ToInt32(token.val);
 		} catch (Exception ) {
 		  value = 0; SemError("number too large");
@@ -494,10 +507,11 @@ public class Parser {
 	static void Variable(out int value) {
 		Expect(identifier_Sym);
 		string ident_name = token.val;
+		IO.Write(token.val);
+		IO.Write("",10-token.val.Length);
+		;
 		int lineNumber = token.line;
 		value = VarTable.FindOffset(ident_name,lineNumber);
-		
-		
 		
 	}
 

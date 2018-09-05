@@ -6,7 +6,7 @@ BEGIN
   {    4 } LDL_0   
   {    5 } LDC      20
   {    7 } CLE     
-  {    8 } BZE      43
+  {    8 } BZE      45
   {   10 } LDC_1   
   {   11 } STL_1   
   {   12 } LDL_0   
@@ -35,5 +35,6 @@ BEGIN
   {   39 } ADD     
   {   40 } STL_0   
   {   41 } BRN      4
-  {   43 } HALT    
+  {   43 } BRN      5
+  {   45 } HALT    
 END.

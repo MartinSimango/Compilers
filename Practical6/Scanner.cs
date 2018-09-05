@@ -215,19 +215,6 @@ public class Scanner {
 		int level = 1, line0 = line, lineStart0 = lineStart;
 		NextCh();
 			for(;;) {
-				if (ch == 10) {
-					level--;
-					if (level == 0) { oldEols = line - line0; NextCh(); return true; }
-					NextCh();
-				} else if (ch == Buffer.EOF) return false;
-				else NextCh();
-			}
-	}
-
-	static bool Comment1() {
-		int level = 1, line0 = line, lineStart0 = lineStart;
-		NextCh();
-			for(;;) {
 				if (ch == '}') {
 					level--;
 					if (level == 0) { oldEols = line - line0; NextCh(); return true; }
@@ -286,7 +273,7 @@ public class Scanner {
 	/* AW Scan() renamed to NextToken() */
 	static Token NextToken() {
 		while (ignore[ch]) NextCh();
-		if (ch == ';' && Comment0() ||ch == '{' && Comment1()) return NextToken();
+		if (ch == '{' && Comment0()) return NextToken();
 		t = new Token();
 		t.pos = pos; t.col = pos - lineStart + 1; t.line = line;
 		int state = start[ch];
