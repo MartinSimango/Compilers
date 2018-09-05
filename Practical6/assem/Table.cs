@@ -47,10 +47,10 @@ namespace Assem {
         return null; 
       } 
       else{
-        LabelEntry entryFound = list[i];
+       /* LabelEntry entryFound = list[i];
         int labAdr = CodeGen.GetCodeLength();
         entryFound.AddReference(labAdr);
-        list[i] = entryFound;
+        list[i] = entryFound;*/
         return list[i];
       }
     } // find
@@ -90,7 +90,8 @@ namespace Assem {
       this.name   = name;
       this.offset = offset;
       refs = new List<int>();
-      this.refs.Add(lineNumber);
+	  refs.Add(offset);
+      refs.Add(lineNumber);
     }
 
     public void AddReference(int lineNumber) {
@@ -106,22 +107,19 @@ namespace Assem {
     private static List<VariableEntry> list = new List<VariableEntry>();
     private static int varOffset = 0;
 
-    public static int FindOffset(string name) {
+    public static int FindOffset(string name,int lineNumber) {
     // Searches table for variable entry matching name.  If found then returns the known offset.
     // If not found, makes an entry and updates the master offset
       int i = 0;
       while (i < list.Count && !name.Equals(list[i].name)) i++;      
       if (i >= list.Count) { 
-        list.Add(new VariableEntry(name, i, i)); 
-        varOffset = i; 
-        return i;
+        list.Add(new VariableEntry(name, varOffset, lineNumber)); 	
+        return varOffset++;
+		
       }
-      else {
-        VariableEntry entryFound = list[i];
-        int varAdr = CodeGen.GetCodeLength();
-        entryFound.AddReference(varAdr);
-        list[i] = entryFound;
-        return i;
+      else { //variable already used
+		list[i].AddReference(lineNumber);
+        return list[i].offset; //could return i but this makes more logical sense
       }
     } // FindOffset
 

@@ -17,61 +17,69 @@ CHARACTERS
   letter     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" .
   digit      = "0123456789" .
   stringCh   = ANY - '"' - control .
-  printable  = CHR(0) .. CHR(255) - lf.
 
 TOKENS
   identifier = letter { letter | digit } .
   number     = [ '+' | '-' ] digit { digit } .
   label      = letter { letter | digit } ":" .
   stringLit  = '"' { stringCh } '"' .
-  Comment    = ";" { printable } .
-  EOL = lf .
 
-//COMMENTS FROM "{" TO "}"
-//COMMENTS FROM ";" TO lf
+COMMENTS FROM "{" TO "}"
+COMMENTS FROM ";" TO lf
 
+IGNORE CHR(9) .. CHR(13)
 
-IGNORE CHR(9) .. CHR(13) - lf 
-//IGNORE '\t' + '\r' 
 
 PRODUCTIONS
   Assem
-  = "ASSEM" EOL "BEGIN"
+  = "ASSEM" "BEGIN"
        { Statement }
-    "END" "." {EOL} EOF               (. LabelTable.CheckLabels(); 
-                                    LabelTable.ListReferences(pretty); 
-                                    VarTable.ListReferences(pretty); .)
+    "END" "."                    (. LabelTable.CheckLabels(); 
+	                                LabelTable.ListReferences(pretty);
+								    VarTable.ListReferences(pretty);
+								 .)
     .
 
-//  Statement
-//  = OneWord | TwoWord | WriteString | Label | Branch .
-  Statement  
-  = [Label] [OneWord | TwoWord | WriteString | Branch] [Comment] EOL
-  .
+  Statement
+  = OneWord | TwoWord | WriteString | Label | Branch .
 
   OneWord
   = (   "ADD"  | "AND"  | "ANEW" | "CEQ"  | "CGE"  | "CGT"  | "CLE"  | "CLT"
       | "CNE"  | "DIV"  | "HALT" | "INPB" | "INPI" | "LDV"  | "LDXA" | "MUL"
       | "NEG"  | "NOP"  | "NOT"  | "OR"   | "PRNB" | "PRNI" | "PRNL" | "REM"
-      | "STO"  | "SUB"  | "INC"  | "DEC"  | "LDL_1"| "LDL_2"| "LDL_3"| "LDL_0"
-      | "LDC_0"| "LDC_1"| "LDC_2"| "LDC_3"| "LDA_0"| "LDA_1"| "LDA_2"| "LDA_3"
-      | "STL_0"| "STL_1"| "STL_2"| "STL_3" ) (. CodeGen.OneWord(token.val); .)
+      | "STO"  | "SUB" | "INC" | "DEC"    | "LDL_0"| "LDL_1" | "LDL_2"| "LDL_3"  
+	  |"LDC_0" | "LDC_1"| "LDC_2"| "LDC_3"| "LDA_0"| "LDA_1"| "LDA_2"| "LDA_3"
+      | "STL_0"| "STL_1"| "STL_2"| "STL_3"  )  (. CodeGen.OneWord(token.val); .)
   .
 
-  TwoWord                                        (. int value; .)
+  TwoWord                        (. int value; .)
   = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val; .)
-      (Number<out value>   (. CodeGen.TwoWord(mnemonic, value); .)
-       | Variable <out value> (. CodeGen.TwoWord(mnemonic, value); .)
+     (Number<out value>            (. CodeGen.TwoWord(mnemonic, value); .)
+	
+	| Variable<out value>   (. CodeGen.TwoWord(mnemonic,value); .)
+    	
+	)
+  .
 
-  ).
 
   Number<out int value>
-  = (number                         (. try {
+  = number                       (. try {
                                       value = Convert.ToInt32(token.val);
                                     } catch (Exception ) {
-                                      value = 0; SemError("Not a ident");
+                                      value = 0; SemError("number too large");
                                     } .)
-    ) .
+
+  .
+  
+  Variable<out int value>
+  = identifier 				(. string ident_name = token.val;
+							   int lineNumber = token.line;
+							   value = VarTable.FindOffset(ident_name,lineNumber);
+							   
+							   
+						    .)
+		
+  .
 
   WriteString                    (. string str; .)
   = "PRNS" StringConst<out str>  (. CodeGen.WriteString(str); .)
@@ -83,22 +91,21 @@ PRODUCTIONS
 
   Label
   = label                        (. string name = token.val.Substring(0, token.val.Length - 1).ToLower();
-                                    LabelEntry entry = LabelTable.Find(name);
-                                    if (entry == null){
-                                      Label lab = new Label(known);
-                                      int labAdr = CodeGen.GetCodeLength();
-                                      LabelTable.Insert(new LabelEntry(name, lab, labAdr));
-                                    }
+                                    int lineNumber = -token.line;
+									LabelEntry entry = LabelTable.Find(name);
+                                    if (entry == null){ //new label to be defined
+                                      LabelTable.Insert(new LabelEntry(name, new Label(known),lineNumber));
+									  }
                                     else if (entry.label.IsDefined())
                                       SemError("redefined label");
-                                    else entry.label.Here(); .)
+                                    else {
+										entry.label.Here(); 	
+										entry.AddReference(lineNumber); //label was defined here	
+									}
+									
+									.)
   .
 
-  Variable<out int value>
-  = identifier                   (. string name = token.val;
-                                    int offset = VarTable.FindOffset(name);
-                                    value = offset; .)
-  .
   Branch                         (. int target;
                                     string name;
                                     Label lab; .)
@@ -107,12 +114,13 @@ PRODUCTIONS
       | Ident<out name>          (. LabelEntry entry = LabelTable.Find(name);
                                     if (entry == null) {
                                       lab = new Label(!known);
-                                      int labAdr = CodeGen.GetCodeLength();
-                                      LabelTable.Insert(new LabelEntry(name, lab, -labAdr));
+									  int lineNumber = token.line;
+                                      LabelTable.Insert(new LabelEntry(name, lab,lineNumber));
                                     }
-                                    else {
-                                      lab = entry.label;
-                                    }
+                                    else{
+										lab = entry.label;
+									    entry.AddReference(token.line);
+									}
                                     CodeGen.Branch(mnemonic, lab); .)
     ) .
 
