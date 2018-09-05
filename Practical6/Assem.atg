@@ -29,13 +29,13 @@ TOKENS
   
 
 COMMENTS FROM "{" TO "}"
-COMMENTS FROM ";" TO lf 
+//COMMENTS FROM ";" TO lf 
 
 IGNORE CHR(9) .. CHR(13) - lf
 
 
 PRODUCTIONS
-  Assem = "ASSEM" EOL "BEGIN" EOL (. IO.WriteLine("ASSEM\nBEGIN\n"); .)
+  Assem = "ASSEM" EOL "BEGIN" EOL (. IO.WriteLine("ASSEM\nBEGIN"); .)
      { Statement }
     "END" "." { EOL }            (. LabelTable.CheckLabels(); 
 	                                LabelTable.ListReferences(pretty);
@@ -43,14 +43,18 @@ PRODUCTIONS
 								 .)
     .
      
-  Statement                      (. bool hasLabel = true; .)
+  Statement                      (. bool hasLabel = false; .)
   = [  Label                     (. IO.Write(token.val);
                                     hasLabel = true;
                                     IO.Write("", (15-token.val.Length)); .)
-      ]
-     [OneWord                   (. IO.Write(token.val); .)
+      ]                          (. if(!hasLabel) IO.Write("",15); .)
+    [  OneWord                   (. IO.Write(token.val); 
+	                                IO.Write("",18-token.val.Length); .)
 	  | TwoWord
-	  | WriteString | Branch ] [ Comment ] EOL (. IO.WriteLine(); .)
+	  | WriteString 
+	  | Branch ] 
+	  [ Comment                  (. IO.Write(token.val); .)
+	  ] EOL (. IO.WriteLine(); .)
 	  .
 
   OneWord
@@ -64,10 +68,9 @@ PRODUCTIONS
 
   TwoWord                        (. int value; .)
   = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val;
-                                                    IO.Write(token.val); .)
-     (Number<out value>            (. CodeGen.TwoWord(mnemonic, value);
-                                      	 .)
-	
+                                                    IO.Write(token.val);
+ 													IO.Write("",8-token.val.Length); .)
+     (Number<out value>            (. CodeGen.TwoWord(mnemonic, value); .)
 	| Variable<out value>   (. CodeGen.TwoWord(mnemonic,value); .)
     	
 	)
@@ -76,6 +79,8 @@ PRODUCTIONS
 
   Number<out int value>
   = number                       (. try {
+                                      IO.Write(token.val);
+									  IO.Write("",10-token.val.Length);
                                       value = Convert.ToInt32(token.val);
                                     } catch (Exception ) {
                                       value = 0; SemError("number too large");
@@ -85,16 +90,21 @@ PRODUCTIONS
   
   Variable<out int value>
   = identifier 				(. string ident_name = token.val;
+							   IO.Write(token.val);
+							   IO.Write("",10-token.val.Length);
+							 ;
 							   int lineNumber = token.line;
 							   value = VarTable.FindOffset(ident_name,lineNumber);
-							   
-							   
 						    .)
 		
   .
 
   WriteString                    (. string str; .)
-  = "PRNS" StringConst<out str>  (. CodeGen.WriteString(str); .)
+  = "PRNS" StringConst<out str>  (. CodeGen.WriteString(str); 
+                                    IO.Write("PRNS");
+									IO.Write("",4);
+									IO.Write(token.val);
+									IO.Write("",10-token.val.Length); .)
   .
 
   StringConst<out string str>
@@ -121,8 +131,11 @@ PRODUCTIONS
   Branch                         (. int target;
                                     string name;
                                     Label lab; .)
-  = ( "BRN" | "BZE" )            (. string mnemonic = token.val; .)
-    (   Number<out target>       (. CodeGen.TwoWord(mnemonic, target); .)
+  = ( "BRN" | "BZE" )            (. string mnemonic = token.val;
+								    IO.Write(token.val);
+									IO.Write("",5);
+									.)
+    (   Number<out target>       (. CodeGen.TwoWord(mnemonic, target);	.)
       | Ident<out name>          (. LabelEntry entry = LabelTable.Find(name);
                                     if (entry == null) {
                                       lab = new Label(!known);
@@ -133,6 +146,8 @@ PRODUCTIONS
 										lab = entry.label;
 									    entry.AddReference(token.line);
 									}
+									IO.Write(name);
+									IO.Write("",10-name.Length);
                                     CodeGen.Branch(mnemonic, lab); .)
     ) .
 
