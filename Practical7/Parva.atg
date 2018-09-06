@@ -341,7 +341,6 @@ PRODUCTIONS
         Statement<frame>          (. falseLabel.Here(); .)
   .
 
-
   WhileStatement<StackFrame frame>    (. Label loopExit  =
 								 new Label(!known);
                                          Label loopStart =
