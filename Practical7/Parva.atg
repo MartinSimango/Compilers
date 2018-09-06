@@ -333,7 +333,10 @@ PRODUCTIONS
   IfStatement<StackFrame frame>
                    			  (. Label falseLabel = 
 							new Label(!known); .)
-  =  "if" "(" Condition ")"       (. CodeGen.BranchFalse
+  =  "if" "(" Condition ")"
+     ["then"                    (. SemError("found 'then' in if statement"); .)
+     ]      
+                                (. CodeGen.BranchFalse
 								(falseLabel); .)
         Statement<frame>          (. falseLabel.Here(); .)
   .
@@ -592,6 +595,10 @@ PRODUCTIONS
   EqualOp<out int op>                 (. op = CodeGen.nop; .)
   =    "=="                           (. op = CodeGen.ceq; .)
      | "!="                           (. op = CodeGen.cne; .)
+	 | "="                            (. SemError("found '=' instead of '=='");
+                                         op = CodeGen.ceq;	 .)
+	 | "<>"                           (. SemError("found '<>' instead of '!='");
+                                         op = CodeGen.cne; .)
   .
 
   RelOp<out int op>                   (. op = CodeGen.nop; .)
@@ -601,7 +608,8 @@ PRODUCTIONS
      | ">="                           (. op = CodeGen.cge; .)
   .
 
-  AssignOp = "=" .
+  AssignOp = "=" | ":=" (. SemError("found ':=' instead of '='"); .)
+  .
 
   Ident<out string name>
   =  identifier                       (. name = token.val; .)
