@@ -1,0 +1,6 @@
+ASSEM
+BEGIN
+  {    0 } FHDR    
+  {    1 } CALL     -1
+  {    3 } HALT    
+END.

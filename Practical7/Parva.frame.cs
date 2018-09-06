@@ -46,7 +46,7 @@ namespace -->namespace {
     }
 
     public static void Main (string[] args) {
-      bool mergeErrors = false, HeapDump = false, StackDump = false; printTable = false, codeOn = false, execution = true, immediate = false;
+      bool mergeErrors = false, produceCod = false, execution = true, immediate = false;
       string inputName = null;
 
       // ------------------------ process command line parameters:
@@ -58,7 +58,7 @@ namespace -->namespace {
         else if (args[i].ToLower().Equals("-d")) Parser.debug = true;
         else if (args[i].ToLower().Equals("-n")) execution = false;
         else if (args[i].ToLower().Equals("-g")) immediate = true;
-		else if (args[i].ToLower().Equals("-c")) Parser.listCode = true;
+		else if (args[i].ToLower().Equals("-c")) produceCod = true;
         else inputName = args[i];
       }
       if (inputName == null) {
@@ -94,8 +94,7 @@ namespace -->namespace {
       int initSP = CodeGen.GetInitSP();
       string codeName = newFileName(inputName, ".cod");
       int codeLength = CodeGen.GetCodeLength();
-      if (Parser.listCode)
-		PVM.ListCode(codeName, codeLength);
+      PVM.ListCode(codeName, codeLength);
       if (!assembledOK || codeLength == 0) {
         Console.WriteLine("Unable to interpret code");
         System.Environment.Exit(1);
@@ -104,6 +103,9 @@ namespace -->namespace {
         Console.WriteLine("\nCompiled: exiting with no execution requested");
         System.Environment.Exit(1);
       }
+	  else if (produceCod){
+		  Parser.listCode = true;
+	  }
       else {
         if (immediate) PVM.QuickInterpret(codeLength, initSP);
         char reply = 'n';
