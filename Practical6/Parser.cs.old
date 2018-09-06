@@ -177,7 +177,7 @@ public class Parser {
 		Expect(EOL_Sym);
 		Expect(begin_Sym);
 		Expect(EOL_Sym);
-		IO.WriteLine("ASSEM\nBEGIN\n");
+		IO.WriteLine("ASSEM\nBEGIN");
 		while (StartOf(1)) {
 			Statement();
 		}

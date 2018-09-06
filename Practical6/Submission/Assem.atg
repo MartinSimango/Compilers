@@ -40,10 +40,10 @@ COMMENTS FROM "{" TO "}"
 IGNORE CHR(9) .. CHR(13) - lf
 
 PRODUCTIONS
-  Assem = [Comment   (. IO.Write("",CommentColWidth); IO.WriteLine(token.val);.) EOL]  // Comment before as ASSEM
+  Assem = [Comment   (. IO.Write("",CommentColWidth); IO.WriteLine(token.val);.) EOL]  /* Comment before as ASSEM*/
 		  "ASSEM"	 (. IO.Write("ASSEM"); .) 
-		  [Comment (. IO.Write("",CommentColWidth-5); IO.WriteLine(token.val); .) ] EOL // Comment on the same line as ASSEM
-		  [Comment (. IO.Write("",CommentColWidth); IO.WriteLine(token.val); .) EOL ]   // Comment between ASSEM and BEGIN
+		  [Comment (. IO.Write("",CommentColWidth-5); IO.WriteLine(token.val); .) ] EOL /* Comment on the same line as ASSEM*/
+		  [Comment (. IO.Write("",CommentColWidth); IO.WriteLine(token.val); .) EOL ]   /* Comment between ASSEM and BEGIN */
 		   "BEGIN" (. IO.Write("BEGIN"); .) 
 		 [Comment (. IO.Write("",CommentColWidth-5); IO.WriteLine(token.val); .) ] EOL  //Comment on the same line as BEGIN
      { Statement }
@@ -58,7 +58,7 @@ PRODUCTIONS
   Statement                      (. bool hasLabel = false; bool hasInstruct=false;.)
   = [  Label                     (. IO.Write(token.val);
                                     hasLabel = true;
-                                    IO.Write("", (LabelColWidth-token.val.Length)); .)
+                                    IO.Write("", (LabelColWidth - token.val.Length)); .)
       ]                            	
 									  (. if(!hasLabel) IO.Write("",LabelColWidth); .)
     
@@ -89,7 +89,7 @@ PRODUCTIONS
   TwoWord                                        (. int value; .)
   = ( "DSP" | "LDC" | "LDA" | "LDL" | "STL" )    (. string mnemonic = token.val;
                                                     IO.Write(token.val);
- 													IO.Write("",TwoWordColWidth-token.val.Length); .)
+ 													IO.Write("",TwoWordColWidth -token.val.Length); .)
      (Number<out value>                          (. CodeGen.TwoWord(mnemonic, value); .)
 	| Variable<out value>                        (. CodeGen.TwoWord(mnemonic,value); .)
 	)
@@ -98,7 +98,7 @@ PRODUCTIONS
   Number<out int value>
   = number                       (. try {
                                       IO.Write(token.val);
-									  IO.Write("",TwoWordArgColWidth-token.val.Length);
+									  IO.Write("",TwoWordArgColWidth -token.val.Length);
                                       value = Convert.ToInt32(token.val);
                                     } catch (Exception ) {
                                       value = 0; SemError("number too large");
@@ -127,7 +127,7 @@ PRODUCTIONS
   .
 
   Label
-  = label                        (. string name = token.val.Substring(0, token.val.Length-1).ToLower();
+  = label                        (. string name = token.val.Substring(0, token.val.Length - 1).ToLower();
                                     int lineNumber = -token.line;
 									LabelEntry entry = LabelTable.Find(name);
                                     if (entry == null){ //new label to be defined
