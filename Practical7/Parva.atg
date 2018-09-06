@@ -118,9 +118,9 @@ PRAGMAS
   CodeOff     = "$C-" .              (. listCode  = false; .)
   DebugOn     = "$D+" .              (. debug     = true; .)
   DebugOff    = "$D-" .              (. debug     = false; .)
-  StackDump   = "$SD" .              (. CodeGen.Stack(); .)
-  HeapDump    = "$HD" .              (. CodeGen.Heap(); .)
-  TableDump   = "$ST" . (. Table.PrintTable(OutFile.StdOut); .)
+  StackDump   = "$SD" .              (. if(debug) CodeGen.Stack(); .)
+  HeapDump    = "$HD" .              (. if(debug) CodeGen.Heap(); .)
+  TableDump   = "$ST" . (. if(debug)Table.PrintTable(OutFile.StdOut); .)
 
 COMMENTS FROM "//" TO lf
 COMMENTS FROM "/*" TO "*/"
