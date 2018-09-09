@@ -191,7 +191,7 @@ PRODUCTIONS
             | AssignmentOrCall
             | IfStatement<frame>
             | WhileStatement<frame>
-            | RepeatLoop<frame>
+            | RepeatStatement<frame>
             | HaltStatement
             | ReturnStatement
             | ReadStatement
@@ -359,7 +359,7 @@ PRODUCTIONS
                                          loopExit.Here(); .)
   .
 
-  RepeatLoop<StackFrame frame>  
+  RepeatStatement<StackFrame frame>  
                                          (. Label loopStart =
 							    new Label(known); .)
   =  "repeat"         
