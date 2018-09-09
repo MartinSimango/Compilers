@@ -347,6 +347,7 @@ PRODUCTIONS
                                 (. CodeGen.BranchFalse
 								(falseLabel); .)
         Statement<frame>          (. falseLabel.Here(); .)
+     ["else" Statement<frame>]
   .
 
   WhileStatement<StackFrame frame>    (. Label loopExit  =
