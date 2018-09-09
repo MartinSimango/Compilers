@@ -191,6 +191,7 @@ PRODUCTIONS
             | AssignmentOrCall
             | IfStatement<frame>
             | WhileStatement<frame>
+            | RepeatLoop<frame>
             | HaltStatement
             | ReturnStatement
             | ReadStatement
@@ -203,6 +204,12 @@ PRODUCTIONS
   =                                  (. Table.OpenScope(); .)
      "{" { Statement<frame> }
      WEAK "}"                        (. Table.CloseScope(); .)
+  .
+
+  RepeatBlock<StackFrame frame>
+  =                                  (. Table.OpenScope(); .)
+     { Statement<frame> }
+                             (. Table.CloseScope(); .)
   .
 
   ConstDeclarations
@@ -352,6 +359,16 @@ PRODUCTIONS
                                          loopExit.Here(); .)
   .
 
+  RepeatLoop<StackFrame frame>  
+                                         (. Label loopStart =
+							    new Label(known); .)
+  =  "repeat"         
+     RepeatBlock<frame>        
+                            
+     "until" "(" Condition ")" ";" (. CodeGen.BranchFalse
+							   (loopStart); .)
+  .
+
   SwitchStatement<StackFrame frame>       (. int expType; .)
   = "switch"
     "(" Expression<out expType>
@@ -387,7 +404,7 @@ PRODUCTIONS
   .
 
   ReadStatement
-  = "read" "(" ReadList ")" WEAK ";"
+  = "read" "(" ReadList ")" WEAK ";" ["readLine" (. CodeGen.ReadLine(); .)] 
   .
 
   ReadList
@@ -413,11 +430,11 @@ PRODUCTIONS
   .
 
   WriteStatement
-  =  "write" "(" WriteList ")" WEAK ";"
+  =  ("write" "(" WriteList ")" WEAK ";") ["writeLine" (. CodeGen.WriteLine(); .)]
   .
 
   WriteList
-  = WriteElement { WEAK "," WriteElement }
+  = (WriteElement { WEAK "," WriteElement }) 
   .
 
   WriteElement                  (. int expType; string str;.)
