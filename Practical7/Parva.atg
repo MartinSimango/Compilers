@@ -195,6 +195,7 @@ PRODUCTIONS
             | RepeatStatement<frame>
             | HaltStatement
             | ReturnStatement
+            | Max
             | ReadStatement
             | WriteStatement
             | SwitchStatement<frame>
@@ -443,6 +444,9 @@ PRODUCTIONS
 							  break;
                                                     } .)
   .
+  Max                                     (. int maxNum; .) 
+  = "Max" "(" Expression<out maxNum> {"," Expression<out maxNum> } ")" (. CodeGen.LoadConstant(maxNum); .) 
+  . 
 
   WriteStatement
   =  ("write" "(" WriteList ")" WEAK ";") ["writeLine" (. CodeGen.WriteLine(); .)]
@@ -482,6 +486,7 @@ PRODUCTIONS
                           SemError("Boolean operands needed");
                                      type = Types.boolType; .)
      }                            (. shortcircuit.Here(); .)
+      
   .
 
   AndExp<out int type>            (. int type2;
