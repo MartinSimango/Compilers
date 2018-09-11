@@ -195,7 +195,6 @@ PRODUCTIONS
             | RepeatStatement<frame>
             | HaltStatement
             | ReturnStatement
-            | Max
             | ReadStatement
             | WriteStatement
             | SwitchStatement<frame>
@@ -573,6 +572,7 @@ PRODUCTIONS
                            SemError("Boolean operand needed");
                                    type = Types.boolType;
                                    CodeGen.NegateBoolean(); .)
+     | Max 
   .
 
   Primary<out int type>         (. type = Types.noType;
