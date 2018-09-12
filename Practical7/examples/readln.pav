@@ -1,9 +1,10 @@
 void Main () { $C+
 // readln.pav
 // Simple readLine and writeLine
-  int x;
+  int x,y;
   readLine(x);
-  writeLine(x);
+  read(y);
+  writeLine(x,y);
   read(x);  readLine();
   write(x); writeLine();
 }

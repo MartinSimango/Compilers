@@ -340,14 +340,15 @@ PRODUCTIONS
 
   IfStatement<StackFrame frame>
                    			  (. Label falseLabel = 
-							new Label(!known); .)
+							new Label(!known); 
+							   Label endLabel= new Label(!known);
+							.)
   =  "if" "(" Condition ")"
      ["then"                    (. SemError("found 'then' in if statement"); .)
      ]      
-                                (. CodeGen.BranchFalse
-								(falseLabel); .)
-        Statement<frame>          (. falseLabel.Here(); .)
-     ["else" Statement<frame>]
+                                (. CodeGen.BranchFalse(falseLabel); .)
+        Statement<frame>          (. CodeGen.Branch(endLabel);  .)
+     ["else" (.falseLabel.Here(); .) Statement<frame> ]  (. endLabel.Here(); .)
   .
 
   WhileStatement<StackFrame frame>    (. Label loopExit  =
@@ -409,7 +410,7 @@ PRODUCTIONS
   .
 
   HaltStatement
-  =  "halt"                      (. CodeGen.LeaveProgram(); .)
+  =  "halt" "(" [WriteList] ")"                      (. CodeGen.WriteLine(); CodeGen.LeaveProgram(); .)
      WEAK ";"
   .
 
@@ -419,7 +420,8 @@ PRODUCTIONS
   .
 
   ReadStatement
-  = "read" "(" ReadList ")" WEAK ";" ["readLine" (. CodeGen.ReadLine(); .)] 
+  = "read" "(" ReadList ")" WEAK ";" | 
+  "readLine" "(" [ReadList]")" WEAK ";" (. CodeGen.ReadLine(); .) 
   .
 
   ReadList
@@ -443,12 +445,11 @@ PRODUCTIONS
 							  break;
                                                     } .)
   .
-  Max                                     (. int maxNum; .) 
-  = "Max" "(" Expression<out maxNum> {"," Expression<out maxNum> } ")" (. CodeGen.LoadConstant(maxNum); .) 
-  . 
+
 
   WriteStatement
-  =  ("write" "(" WriteList ")" WEAK ";") ["writeLine" (. CodeGen.WriteLine(); .)]
+  =  "write" "(" WriteList ")" WEAK ";" 
+   | ("writeLine" "(" [WriteList] ")" WEAK ";") (. CodeGen.WriteLine(); .)
   .
 
   WriteList
@@ -458,12 +459,12 @@ PRODUCTIONS
   WriteElement                  (. int expType; string str;.)
   =   StringConst<out str>      (. CodeGen.WriteString(str);.)
     | Expression<out expType>   (. if (!(IsArith(expType) ||
-						 expType == Types.boolType))
-                           SemError("cannot write this type");
-                                 switch (expType) {
-                                   case Types.intType:
-                                   case Types.boolType:
-                                   case Types.charType:
+						          expType == Types.boolType))
+                                  SemError("cannot write this type");
+                                  switch (expType) {
+                                      case Types.intType:
+                                      case Types.boolType:
+                                      case Types.charType:
                                      CodeGen.Write(expType);
 							break;
                                    default:  break;
@@ -572,7 +573,19 @@ PRODUCTIONS
                            SemError("Boolean operand needed");
                                    type = Types.boolType;
                                    CodeGen.NegateBoolean(); .)
-     | Max 
+  .
+  
+  MaxMin<out int type>                      (. int count = 0; type = Types.noType; .) 
+  = "Max" "(" Expression<out type>          (. count++; .)
+    {"," Expression<out type>               (. count++; .)
+	} ")"                                   (. CodeGen.MaxMin("MAX",count); .)
+	| "Min" "(" Expression<out type>        (. count++; .)
+    {"," Expression<out type>               (. count++; .)
+	} ")"                                   (. CodeGen.MaxMin("MIN",count); .)
+  . 
+  
+  Sqr<out int type>                        (. type = Types.noType; .)
+  = "Sqr" "(" Expression<out type> ")"      (. CodeGen.OneWord("sqr"); .)
   .
 
   Primary<out int type>         (. type = Types.noType;
@@ -592,7 +605,7 @@ PRODUCTIONS
                                         break;
                                     } .)
      | Constant<out con>        (. type = con.type;
-                            CodeGen.LoadConstant(con.value);.)
+                            CodeGen.LoadConstant(con.value); .)
      | "new"
        (   BasicType<out type>
            "[" Expression<out size>    (. if (!IsArith(size))
@@ -615,6 +628,8 @@ PRODUCTIONS
 							type = Types.intType; .)
          | Expression<out type> ")"
        )
+	 | MaxMin <out type>
+	 | Sqr <out type>
   .
 
   AddOp<out int op>                   	(. op = CodeGen.nop; .)
@@ -670,6 +685,7 @@ PRODUCTIONS
                                        } catch (Exception) {
                                          value = 0; 
 					SemError("number out of range");
+			
                                              } .)
   .
 

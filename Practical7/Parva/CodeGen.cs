@@ -2,7 +2,7 @@
 // P.D. Terry, Rhodes University, 2016
 // As supplied for the last practical of the course
 // 2016/08/30
-
+// Louise, Matt, ...
 using System;
 using System.IO;
 
@@ -281,6 +281,7 @@ namespace Parva {
       }
     } // CodeGen.StoreValue
 
+
     public static void OpenStackFrame(int size) {
     // Generates (possibly incomplete) code to reserve space for local variables
       Emit(PVM.dsp); Emit(size);
@@ -368,6 +369,10 @@ namespace Parva {
       Emit(PVM.OpCode(mnemonic)); Emit(adr.Address());
     } // CodeGen.Branch
 
+	public static void MaxMin(string mnemonic, int amount){
+		if(amount != 1) for(int i = 0; i < amount - 1; i++) Emit(PVM.OpCode(mnemonic));
+	}
+	
   } // end CodeGen
 
 } // namespace

@@ -19,7 +19,7 @@ namespace Parva {
     }
 
     public static void Main (string[] args) {
-      bool mergeErrors = false, HeapDump = false, StackDump = false; printTable = false, codeOn = false, execution = true, immediate = false;
+      bool mergeErrors = false,  execution = true, immediate = false;
       string inputName = null;
 
       // ------------------------ process command line parameters:
@@ -31,10 +31,7 @@ namespace Parva {
         else if (args[i].ToLower().Equals("-d")) Parser.debug = true;
         else if (args[i].ToLower().Equals("-n")) execution = false;
         else if (args[i].ToLower().Equals("-g")) immediate = true;
-		else if (args[i].ToLower().Equals("-c")) codeOn = true;
-		else if (args[i].ToLower().Equals("-st")) printTable = true;
-		else if (args[i].ToLower().Equals("-hd")) HeapDump = true;
-		else if (args[i].ToLower().Equals("-st")) StackDump = true;
+		else if (args[i].ToLower().Equals("-c")) Parser.listCode = true;
         else inputName = args[i];
       }
       if (inputName == null) {
@@ -70,7 +67,7 @@ namespace Parva {
       int initSP = CodeGen.GetInitSP();
       string codeName = newFileName(inputName, ".cod");
       int codeLength = CodeGen.GetCodeLength();
-      if (codeOn)
+      if (Parser.listCode)
 		PVM.ListCode(codeName, codeLength);
       if (!assembledOK || codeLength == 0) {
         Console.WriteLine("Unable to interpret code");
@@ -80,15 +77,6 @@ namespace Parva {
         Console.WriteLine("\nCompiled: exiting with no execution requested");
         System.Environment.Exit(1);
       }
-	  else if (printTable){
-		Parser.Table.PrintTable(OutFile.StdOut);
-	  }
-	  else if (HeapDump && Parser.debug){
-		Parser.CodeGen.Heap();
-	  }
-	  else if (StackDump && Parser.debug){
-		Parser.CodeGen.Stack();
-	  }
       else {
         if (immediate) PVM.QuickInterpret(codeLength, initSP);
         char reply = 'n';

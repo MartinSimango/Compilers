@@ -1,0 +1,21 @@
+ASSEM
+BEGIN
+  {    0 } FHDR    
+  {    1 } CALL     4
+  {    3 } HALT    
+  {    4 } DSP      0
+  {    6 } LDC      1
+  {    8 } PRNI    
+  {    9 } LDC      1
+  {   11 } LDC      4
+  {   13 } LDC      5
+  {   15 } LDC      45
+  {   17 } MIN     
+  {   18 } MIN     
+  {   19 } MIN     
+  {   20 } PRNI    
+  {   21 } LDC      100
+  {   23 } SQR     
+  {   24 } PRNI    
+  {   25 } RETV    
+END.

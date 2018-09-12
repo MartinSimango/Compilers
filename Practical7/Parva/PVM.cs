@@ -104,7 +104,9 @@ namespace Parva {
       sto     =  75,
       stoc    =  76,
       sub     =  77,
-
+      max 	  =  78,
+	  min     =  79,
+	  sqr     =  80,
       nul     = 255;                         // leave gap for future
 
     public static string[] mnemonics = new string[PVM.nul + 1];
@@ -203,7 +205,7 @@ namespace Parva {
         case PVM.ldl:
         case PVM.stl:
         case PVM.stlc:
-        case PVM.prns:
+		case PVM.prns:
           results.Write(mem[cpu.pc], 7); break;
         default: break;
       }
@@ -629,7 +631,22 @@ namespace Parva {
             cpu.pc = mem[cpu.fp - 3];
             cpu.fp = mem[cpu.fp - 2];
             break;
-
+		  case PVM.max:
+			tos = Pop();
+			sos = Pop();
+			if (tos > sos) Push(tos);				
+			else Push(sos);
+		    break;
+		  case PVM.min:
+			tos = Pop();
+			sos = Pop();
+			if (tos < sos) Push(tos);				
+			else Push(sos);
+		    break;
+		  case PVM.sqr:
+			tos = Pop();
+			Push((int)Math.Sqrt(tos));
+		    break;
           default:                // unrecognized opcode
             ps = badOp;
             break;
@@ -844,8 +861,10 @@ namespace Parva {
       mnemonics[PVM.sto]      = "STO";
       mnemonics[PVM.stoc]     = "STOC";
       mnemonics[PVM.sub]      = "SUB";
-
-    } // PVM.Init
+	  mnemonics[PVM.max]	  = "MAX";	
+	  mnemonics[PVM.min]	  = "MIN";
+	  mnemonics[PVM.sqr]      = "SQR";
+	  } // PVM.Init
 
   } // end PVM
 
