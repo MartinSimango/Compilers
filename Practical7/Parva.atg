@@ -314,11 +314,11 @@ PRODUCTIONS
                    			       (. Label falseLabel = new Label(!known); 
 							          Label endLabel = new Label(!known); .)
   =  "if" "(" Condition ")"
-     ["then"                       (. SemError("found 'then' in if statement"); .)
+     [ "then"                      (. Warning("found 'then' in if statement"); .)
      ]      
                                    (. CodeGen.BranchFalse(falseLabel); .)
-        Statement<frame>           (. CodeGen.Branch(endLabel);  .)
-     ["else"                       (.falseLabel.Here(); .)
+     Statement<frame>              (. CodeGen.Branch(endLabel);  .)
+     [ "else"                      (. falseLabel.Here(); .)
 	 Statement<frame> ]            (. endLabel.Here(); .)
   .
 
@@ -573,9 +573,9 @@ PRODUCTIONS
   EqualOp<out int op>                 (. op = CodeGen.nop; .)
   =    "=="                           (. op = CodeGen.ceq; .)
      | "!="                           (. op = CodeGen.cne; .)
-	 | "="                            (. SemError("found '=' instead of '=='");
+	 | "="                            (. Warning("found '=' instead of '=='");
                                          op = CodeGen.ceq;	 .)
-	 | "<>"                           (. SemError("found '<>' instead of '!='");
+	 | "<>"                           (. Warning("found '<>' instead of '!='");
                                          op = CodeGen.cne; .)
   .
 
@@ -586,7 +586,7 @@ PRODUCTIONS
      | ">="                           (. op = CodeGen.cge; .)
   .
 
-  AssignOp = "=" | ":="               (. SemError("found ':=' instead of '='"); .)
+  AssignOp = "=" | ":="               (. Warning("found ':=' instead of '='"); .)
   .
 
   Ident<out string name>
