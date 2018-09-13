@@ -96,6 +96,7 @@ COMPILER Parva $NC
     return entry.kind == Kinds.Fun;
   } // IsCall
 
+   static Label LastLoopExit = new Label(!known);
 /* -------------------------------------------------------- */
 
 CHARACTERS
@@ -142,7 +143,8 @@ PRODUCTIONS
   FuncDeclaration
                                        (. StackFrame frame = new StackFrame();
                                           Entry function = new Entry(); .)
-  =  "void" Ident<out function.name>   (. function.kind = Kinds.Fun;
+  =  "void" Ident<out function.name>   (.   
+					                       function.kind = Kinds.Fun;
                                           function.type = Types.voidType;
                                           function.nParams = 0;
                                           function.firstParam = null;
@@ -174,16 +176,17 @@ PRODUCTIONS
   Body<StackFrame frame>                    (. Label DSPLabel = new Label(known);
                                                int sizeMark = frame.size;
                                                CodeGen.OpenStackFrame(0); .)
-  =  "{" { Statement<frame> } WEAK "}"      (. CodeGen.FixDSP(DSPLabel.Address(),frame.size - sizeMark);
+  =  "{" { Statement<frame> } WEAK "}"      (. 
+                                               CodeGen.FixDSP(DSPLabel.Address(),frame.size - sizeMark);
                                                CodeGen.LeaveVoidFunction(); .)
   .
-
-  Statement<StackFrame frame>
-  =  SYNC (   Block<frame>
+  
+  Statement<StackFrame frame, Label loopExit = null>
+  =  SYNC (   Block<frame,loopExit>
             | ConstDeclarations
             | VarDeclarations<frame>
             | AssignmentOrCall
-            | IfStatement<frame>
+            | IfStatement<frame, loopExit>
             | WhileStatement<frame>
             | DoWhileStatement<frame>
             | RepeatStatement<frame>
@@ -192,18 +195,15 @@ PRODUCTIONS
             | ReadStatement
             | WriteStatement
             | SwitchStatement<frame>
+			| BreakStatement<loopExit>
             | ";"
           ) .
+		  
 
-  Block<StackFrame frame>
+  Block<StackFrame frame,Label loopExit>
   =                                  (. Table.OpenScope(); .)
-     "{" { Statement<frame> }
+     "{" { Statement<frame,loopExit> }
      WEAK "}"                        (. Table.CloseScope(); .)
-  .
-
-  RepeatBlock<StackFrame frame>
-  =                                  (. Table.OpenScope(); .)
-     { Statement<frame> }            (. Table.CloseScope(); .)
   .
 
   ConstDeclarations
@@ -310,39 +310,60 @@ PRODUCTIONS
      ]
   .
 
-  IfStatement<StackFrame frame>
+  IfStatement<StackFrame frame, Label loopExit>
                    			       (. Label falseLabel = new Label(!known); 
 							          Label endLabel = new Label(!known); .)
   =  "if" "(" Condition ")"
      [ "then"                      (. Warning("found 'then' in if statement"); .)
      ]      
                                    (. CodeGen.BranchFalse(falseLabel); .)
-     Statement<frame>              (. CodeGen.Branch(endLabel);  .)
-     [ "else"                      (. falseLabel.Here(); .)
-	 Statement<frame> ]            (. endLabel.Here(); .)
+     Statement<frame, loopExit>              (. CodeGen.Branch(endLabel);  .)
+											 (. falseLabel.Here(); .)
+     [ "else"                     
+	 Statement<frame, loopExit> ]            (. endLabel.Here(); .)
   .
 
   WhileStatement<StackFrame frame>    (. Label loopExit  = new Label(!known);
-                                         Label loopStart = new Label(known); .)
+                                         Label loopStart = new Label(known); 
+										;.)
   =  "while" "(" Condition ")"        (. CodeGen.BranchFalse(loopExit); .)
-     Statement<frame>                 (. CodeGen.Branch(loopStart);
-                                         loopExit.Here(); .)
+     Statement<frame, loopExit>          (. CodeGen.Branch(loopStart); .)
+                                         (. loopExit.Here(); 
+											   LastLoopExit.Here();
+										 .)
   .
 
   DoWhileStatement<StackFrame frame>    (. Label loopExit  = new Label(!known);
-                                           Label loopStart = new Label(known); .)
-  =  "do" Statement<frame>         
+                                           Label loopStart = new Label(known); 
+										  
+										   .)
+  =  "do" Statement<frame, loopExit>         
      "while" "(" Condition ")"          (. CodeGen.BranchFalse(loopExit);
 	                                       CodeGen.Branch(loopStart);
-										   loopExit.Here(); .)
+										   loopExit.Here(); 
+										      LastLoopExit.Here();
+										   .)
   .
 
   RepeatStatement<StackFrame frame>  
-                                         (. Label loopStart = new Label(known); .)
-  =  "repeat" RepeatBlock<frame> 
-     "until" "(" Condition ")" ";"       (. CodeGen.BranchFalse(loopStart); .)
+                                         (. Label loopStart = new Label(known);
+                                            Label loopExit = new Label(!known); 
+											  .)
+  =  "repeat" { Statement<frame, loopExit> } 
+     "until" "(" Condition ")" WEAK ";"       (. CodeGen.BranchFalse(loopStart);
+	                                        loopExit.Here(); 
+									        LastLoopExit.Here();
+											.)
   .
 
+  BreakStatement<Label loopExit>
+  = "break" WEAK ";" (. 
+						if(LastLoopExit==null) SemError("Cannot use 'break' out of loop");
+						else CodeGen.Branch(LastLoopExit); 
+						Console.WriteLine(LastLoopExit);
+						.)
+  .
+  
   SwitchStatement<StackFrame frame>       (. int expType; .)
   = "switch"
     "(" Expression<out expType>
