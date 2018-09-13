@@ -2,7 +2,7 @@
 // P.D. Terry, Rhodes University, 2016
 // As supplied for the last practical of the course
 // 2016/08/30
-// Louise, Matt, ...
+// Louise Poole, Martin Simango, Matt Doherty
 using System;
 using System.IO;
 

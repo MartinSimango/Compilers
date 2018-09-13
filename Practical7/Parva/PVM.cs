@@ -3,6 +3,7 @@
 // P.D. Terry, Rhodes University, 2016
 // As supplied for the last practical of the course
 // 2016/08/30
+// Louise Poole, Martin Simango, Matt Doherty
 
 using Library;
 using System;
@@ -650,7 +651,6 @@ namespace Parva {
           default:                // unrecognized opcode
             ps = badOp;
             break;
-
         } // switch(cpu.ir)
       } while (ps == running);
       if (ps != finished) PostMortem(results, pcNow);
@@ -660,7 +660,6 @@ namespace Parva {
       Console.WriteLine("\n" + ops + " operations.  Run Time " + elapsedTime);
       timer.Reset();
       timer.Stop();
-
     } // PVM.Emulator
 
     public static void QuickInterpret(int codeLen, int initSP) {
@@ -713,7 +712,6 @@ namespace Parva {
         i++;
       }
       codeFile.WriteLine();
-
       ------------- */
 
       i = 0;
@@ -738,7 +736,6 @@ namespace Parva {
           case PVM.stlc:
             i = (i + 1) % memSize; codeFile.Write(mem[i]);
             break;
-
           case PVM.prns:                // special case
             i = (i + 1) % memSize;
             j = mem[i]; codeFile.Write(" \"");
@@ -758,7 +755,6 @@ namespace Parva {
             }
             codeFile.Write("\"");
             break;
-
         } // switch
         i = (i + 1) % memSize;
         codeFile.WriteLine();
