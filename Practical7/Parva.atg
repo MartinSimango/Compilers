@@ -96,7 +96,7 @@ COMPILER Parva $NC
     return entry.kind == Kinds.Fun;
   } // IsCall
 
-   static Label LastLoopExit = new Label(!known);
+
 /* -------------------------------------------------------- */
 
 CHARACTERS
@@ -329,7 +329,7 @@ PRODUCTIONS
   =  "while" "(" Condition ")"        (. CodeGen.BranchFalse(loopExit); .)
      Statement<frame, loopExit>          (. CodeGen.Branch(loopStart); .)
                                          (. loopExit.Here(); 
-											   LastLoopExit.Here();
+
 										 .)
   .
 
@@ -341,7 +341,7 @@ PRODUCTIONS
      "while" "(" Condition ")"          (. CodeGen.BranchFalse(loopExit);
 	                                       CodeGen.Branch(loopStart);
 										   loopExit.Here(); 
-										      LastLoopExit.Here();
+										     
 										   .)
   .
 
@@ -352,15 +352,15 @@ PRODUCTIONS
   =  "repeat" { Statement<frame, loopExit> } 
      "until" "(" Condition ")" WEAK ";"       (. CodeGen.BranchFalse(loopStart);
 	                                        loopExit.Here(); 
-									        LastLoopExit.Here();
+									       
 											.)
   .
 
   BreakStatement<Label loopExit>
   = "break" WEAK ";" (. 
-						if(LastLoopExit==null) SemError("Cannot use 'break' out of loop");
-						else CodeGen.Branch(LastLoopExit); 
-						Console.WriteLine(LastLoopExit);
+						if(loopExit==null) SemError("Cannot use 'break' out of loop");
+						else CodeGen.Branch(loopExit); 
+						
 						.)
   .
   
