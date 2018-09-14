@@ -268,14 +268,31 @@ PRODUCTIONS
 
 
   AssignmentOrCall                      (. int expType;
-                                           DesType des; .)
+                                           DesType des; 
+										   bool prefix=false,postfix=false; //whether "++x" or "--x" has been used
+										   bool inc=false;
+										   .)
   =  ( IF (IsCall(out des))             // resolver handles LL1 conflict
          identifier                     (. CodeGen.FrameHeader(); .)
          "(" Arguments<des> ")"         (. CodeGen.Call(des.entry.entryPoint); .)
-      |  Designator<out des>            (. if(des.entry.kind != Kinds.Var) SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]); .)
-         AssignOp
-         Expression<out expType>        (. if(!Assignable(des.type,expType)) SemError("incompatible types in assignment");
-                                           CodeGen.Assign(des.type); .)
+      |  [IncOrDec<out inc>  
+		 Designator<out des>                (.    
+											      if(des.entry.kind != Kinds.Var) 
+												  SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]);
+												  CodeGen.IncOrDec(inc,des.type);												  
+									        .)
+		 ] 
+	     
+	                                      
+	   |  Designator<out des>                       (. if(des.entry.kind != Kinds.Var) 
+														SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]); .)
+        ( AssignOp Expression<out expType>        (. if(!Assignable(des.type,expType)) SemError("incompatible types in assignment");
+                                                     CodeGen.Assign(des.type); 
+										   
+										           .)
+		 
+		|  IncOrDec<out inc>  							(. CodeGen.IncOrDec(inc,des.type); .)
+	    )		                  
      ) WEAK ";"
   .
 
@@ -295,20 +312,26 @@ PRODUCTIONS
   .
 
   Designator<out DesType des>           (. string name;
-                                           int indexType; .)
-  =  Ident<out name>                    (. Entry entry = Table.Find(name);
+                                           int indexType; 
+										   bool prefix=false,postfix=false;
+										   bool inc =true;
+										   .)
+  =  
+  Ident<out name>                    (. Entry entry = Table.Find(name);
                                            if (!entry.declared) SemError("undeclared identifier");
                                            des = new DesType(entry);
                                            if (entry.kind == Kinds.Var) CodeGen.LoadAddress(entry); .)
      [  "["              	            (. if (IsArray(des.type)) des.type--;
                         		           else SemError("unexpected subscript");
                                            if (des.entry.kind != Kinds.Var) SemError("unexpected subscript"); 
-                                           CodeGen.Dereference(); .)
+                                           CodeGen.Dereference(); 
+										   
+										   .)
         Expression<out indexType>       (. if (!IsArith(indexType)) SemError("invalid subscript type");
                                            CodeGen.Index(); .)
            "]"
-     ]
-  .
+     ] 
+	.
 
   IfStatement<StackFrame frame, Label loopExit>
                    			       (. Label falseLabel = new Label(!known); 
@@ -608,6 +631,11 @@ PRODUCTIONS
   .
 
   AssignOp = "=" | ":="               (. Warning("found ':=' instead of '='"); .)
+ 
+  .
+  IncOrDec<out bool inc> 	(. inc = false; .)
+  =     
+  "++" (. inc=true; .) | "--" (.inc = false;.)
   .
 
   Ident<out string name>
