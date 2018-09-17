@@ -108,6 +108,8 @@ namespace Parva {
       max 	  =  78,
 	  min     =  79,
 	  sqr     =  80,
+	  aceq    =  81, //check if array's are equal;
+	  acpy    =  82, //copy array
       nul     = 255;                         // leave gap for future
 
     public static string[] mnemonics = new string[PVM.nul + 1];
@@ -443,7 +445,7 @@ namespace Parva {
             if (heapPtr == 0) ps = nullRef;
             else if (heapPtr < heapBase || heapPtr >= cpu.hp) ps = badMem;
             else if (adr < 0 || adr >= mem[heapPtr]) ps = badInd;
-            else Push(heapPtr + adr + 1);
+            else Push(heapPtr + adr + 1); 
             break;
           case PVM.inpi:          // integer input
             adr = Pop();
@@ -648,6 +650,42 @@ namespace Parva {
 			tos = Pop();
 			Push((int)Math.Sqrt(tos));
 		    break;
+		  case PVM.aceq:
+		    tos =Pop(); //address of array 1
+			sos = Pop(); //address of array 1
+			int len_1 = mem[tos];
+			int len_2 = mem[sos];
+			if(len_1!=len_2){ 
+				Push(0); // if lengths aren't equal then arrays can't be equal
+			}
+			else{
+				int i=0;
+				while(i<len_1 && mem[tos+1+i] == mem[sos+1+i]){
+					i++;
+				}
+				if(i==len_1) 
+					Push(1);
+				else
+					Push(0);	  		
+			}
+			break;
+			case PVM.acpy:
+			    tos =Pop(); //address to be copied
+			    sos = Pop(); //address of array to be assigned 
+				if(mem[tos]==mem[sos]){ //if the lengths are not the same leave it
+				  int i=0;
+				  while(i<mem[tos]){
+					  mem[sos+1+i] = mem[tos+1+i];
+				  }
+				
+				}
+				/*
+				else{
+					IO.WriteLine("Arrays must be the same size to be copied!");
+				    ps=badVal;
+				}
+				*/
+			break;
           default:                // unrecognized opcode
             ps = badOp;
             break;
@@ -860,7 +898,9 @@ namespace Parva {
 	  mnemonics[PVM.max]	  = "MAX";	
 	  mnemonics[PVM.min]	  = "MIN";
 	  mnemonics[PVM.sqr]      = "SQR";
-	  } // PVM.Init
+	  mnemonics[PVM.aceq]     = "ACEQ";
+	  mnemonics[PVM.acpy]     = "ACPY";
+ 	  } // PVM.Init
 
   } // end PVM
 

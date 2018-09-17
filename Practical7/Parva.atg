@@ -285,10 +285,17 @@ PRODUCTIONS
 	                                      
 	   |  Designator<out des>                       (. if(des.entry.kind != Kinds.Var) 
 														SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]); .)
-        ( AssignOp Expression<out expType>        (. if(!Assignable(des.type,expType)) SemError("incompatible types in assignment");
+        ( AssignOp (Expression<out expType>        (. if(!Assignable(des.type,expType)) SemError("incompatible types in assignment");
                                                      CodeGen.Assign(des.type); 
 										   
 										           .)
+												   
+		|   "Copy" "(" Expression<out expType> ")"     (. if(!IsArray(des.type)) SemError("Copy is meant for assigning arrays");  
+			                                            if(!Assignable(des.type,expType)) SemError("incompatible types in assignment");
+											              CodeGen.OneWord("ACPY");
+										                  
+										                .)
+		)
 		 
 		|  IncOrDec<out inc>  							(.     
 															  if(des.entry.kind != Kinds.Var || (des.type!= Types.charType && des.type!= Types.intType  )) // can only inc or dec char and int types]
@@ -569,7 +576,7 @@ PRODUCTIONS
 											  CodeGen.OneWord("sqr"); .)
   .
   
-  Length<out int type> (. type= Types.noType; string varName=""; .)
+  Length<out int type> (. type = Types.noType; .)
   = "Length" "(" Expression<out type> ")"  (. 
                              
 										  if(!IsArray(type)) //not an array type
@@ -580,6 +587,21 @@ PRODUCTIONS
 									   									  
 										.)
   .
+  
+  Equals<out int type> (. type = Types.noType; int type_2= Types.noType; .)
+  = "Equals" "(" Expression<out type> "," Expression<out type_2> ")" (. if(!(IsArray(type) && IsArray(type_2) ) )   
+																		  SemError("'Equals' should takes in 2 array's");
+																		if(type!=type_2) 
+																			SemError("Arrays should be of the same type");
+								                                           //at this stage both address of the array are on the top stack
+																		   CodeGen.OneWord("ACEQ");
+																		   type = Types.boolType; //return a bool type which is the value at the top of the stack
+																		  
+																		  .)
+  
+  .
+  
+
   Primary<out int type>         (. type = Types.noType;
                                    int size;
                                    DesType des;
@@ -615,9 +637,10 @@ PRODUCTIONS
                                             else type = Types.intType; .)
          | Expression<out type> ")"
        )
-	 | MaxMin <out type>
-	 | Sqr <out type>
-	 | Length<out type>                
+	 | MaxMin <out type> //return int or char
+	 | Sqr <out type>  //return int
+	 | Length<out type> //return int    
+     | Equals<out type> // return bool
 
   .
 
