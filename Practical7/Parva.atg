@@ -277,8 +277,8 @@ PRODUCTIONS
          "(" Arguments<des> ")"         (. CodeGen.Call(des.entry.entryPoint); .)
       |  [IncOrDec<out inc>  
 		 Designator<out des>                (.    
-											      if(des.entry.kind != Kinds.Var) 
-												  SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]);
+											      if(des.entry.kind != Kinds.Var || (des.type!= Types.charType && des.type!= Types.intType  )) // can only inc or dec char and int types
+												  SemError("cannot increment or decrement " + Kinds.kindNames[des.entry.kind]);
 												  CodeGen.IncOrDec(inc,des.type);												  
 									        .)
 		 ] 
@@ -291,7 +291,10 @@ PRODUCTIONS
 										   
 										           .)
 		 
-		|  IncOrDec<out inc>  							(. CodeGen.IncOrDec(inc,des.type); .)
+		|  IncOrDec<out inc>  							(.     
+															  if(des.entry.kind != Kinds.Var || (des.type!= Types.charType && des.type!= Types.intType  )) // can only inc or dec char and int types]
+												                SemError("cannot increment or decrement " + Kinds.kindNames[des.entry.kind]);
+																CodeGen.IncOrDec(inc,des.type); .)
 	    )		                  
      ) WEAK ";"
   .
@@ -313,8 +316,6 @@ PRODUCTIONS
 
   Designator<out DesType des>           (. string name;
                                            int indexType; 
-										   bool prefix=false,postfix=false;
-										   bool inc =true;
 										   .)
   =  
   Ident<out name>                    (. Entry entry = Table.Find(name);
