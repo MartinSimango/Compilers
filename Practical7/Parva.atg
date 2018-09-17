@@ -210,6 +210,10 @@ PRODUCTIONS
   = "const" OneConst { WEAK "," OneConst }
     WEAK ";"
   .
+  FinalDeclarations   (. int type= Types.noType; .)
+  = "final" Type<out type> OneConst { Weak "," OneConst}
+                                                
+  .
 
   OneConst                           (. Entry constant = new Entry();
                                         ConstRec con; .)
@@ -219,7 +223,8 @@ PRODUCTIONS
                                         Table.Insert(constant); .)
   .
 
-  Constant<out ConstRec con>         (. con = new ConstRec(); .)
+  Constant<out ConstRec con,out bool exp>         (. con = new ConstRec(); 
+													 exp = false;.)
   =   IntConst<out con.value>        (. con.type = Types.intType; .)
     | CharConst<out con.value>       (. con.type = Types.charType; .)
     | "true"                         (. con.type = Types.boolType; 
@@ -228,6 +233,7 @@ PRODUCTIONS
 						                con.value = 0; .)
     | "null"                         (. con.type = Types.nullType;
 						                con.value = 0; .)
+	| Expression<out con.type>       (. exp = true; .)
   .
 
   VarDeclarations<StackFrame frame>          (. int type; .)
