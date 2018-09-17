@@ -269,7 +269,6 @@ PRODUCTIONS
 
   AssignmentOrCall                      (. int expType;
                                            DesType des; 
-										   bool prefix=false,postfix=false; //whether "++x" or "--x" has been used
 										   bool inc=false;
 										   .)
   =  ( IF (IsCall(out des))             // resolver handles LL1 conflict
@@ -459,7 +458,7 @@ PRODUCTIONS
   =   StringConst<out str>      (. CodeGen.WriteString(str);.)
     | Expression<out expType>   (. if (!(IsArith(expType) ||
 						          expType == Types.boolType))
-                                  SemError("cannot write this type");
+                                  SemError("cannot write this type ");
                                   switch (expType) {
                                       case Types.intType:
                                       case Types.boolType:
@@ -553,18 +552,34 @@ PRODUCTIONS
   .
   
   MaxMin<out int type>                      (. int count = 0; type = Types.noType; .) 
-  = "Max" "(" Expression<out type>          (. count++; .)
-    {"," Expression<out type>               (. count++; .)
+  = "Max" "(" Expression<out type>          (.  if(!IsArith(type)) SemError("Max only takes in arithmetic types");
+													count++; .)
+    {"," Expression<out type>               (.  if(!IsArith(type)) SemError("Max only takes in arithmetic types");
+	                                           count++;  .)
 	} ")"                                   (. CodeGen.MaxMin("MAX",count); .)
-	| "Min" "(" Expression<out type>        (. count++; .)
-    {"," Expression<out type>               (. count++; .)
+	| "Min" "(" Expression<out type>        (.  if(!IsArith(type)) SemError("Min only takes in arithmetic types"); 
+											  count++; .)
+    {"," Expression<out type>               (.  if(!IsArith(type)) SemError("Min only takes in arithmetic types"); 
+											    count++; .)
 	} ")"                                   (. CodeGen.MaxMin("MIN",count); .)
   . 
   
   Sqr<out int type>                         (. type = Types.noType; .)
-  = "Sqr" "(" Expression<out type> ")"      (. CodeGen.OneWord("sqr"); .)
+  = "Sqr" "(" Expression<out type> ")"      (.   if(type!= Types.intType) SemError("Sqr only takes in int types");    
+											  CodeGen.OneWord("sqr"); .)
   .
-
+  
+  Length<out int type> (. type= Types.noType; string varName=""; .)
+  = "Length" "(" Expression<out type> ")"  (. 
+                             
+										  if(!IsArray(type)) //not an array type
+										  SemError("Argument of Length must be an array type");
+										  CodeGen.Dereference();  /* array type was returned from expression so on the stack is the value of the array (which is actually it's address of the first element of it) 
+										  so dereference that value to get the length(first element is length of array) */
+										  type= Types.intType; // return type is an int cause that's what's going to be on top of the stack
+									   									  
+										.)
+  .
   Primary<out int type>         (. type = Types.noType;
                                    int size;
                                    DesType des;
@@ -602,6 +617,8 @@ PRODUCTIONS
        )
 	 | MaxMin <out type>
 	 | Sqr <out type>
+	 | Length<out type>                
+
   .
 
   AddOp<out int op>                   (. op = CodeGen.nop; .)
