@@ -50,9 +50,10 @@ namespace Parva {
     public const int
       Con   = 0,
       Var   = 1,
-      Fun   = 2;
+      Fun   = 2,
+	  Fin   = 3; //final kinds
 
-    public static string[] kindNames = { "const", "var  ", "func "};
+    public static string[] kindNames = { "const", "var  ", "func ","final"};
 
   } // end Kinds
 

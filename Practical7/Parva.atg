@@ -210,21 +210,20 @@ PRODUCTIONS
   = "const" OneConst { WEAK "," OneConst }
     WEAK ";"
   .
-  FinalDeclarations   (. int type= Types.noType; .)
-  = "final" Type<out type> OneConst { Weak "," OneConst}
-                                                
-  .
 
-  OneConst                           (. Entry constant = new Entry();
-                                        ConstRec con; .)
+
+  OneConst                   (. Entry constant = new Entry();
+                                 ConstRec con;  .)
   =  Ident<out constant.name>        (. constant.kind = Kinds.Con; .)
-     AssignOp Constant<out con>      (. constant.value = con.value;
+     AssignOp Constant<out con>     (.  constant.value = con.value;
                                         constant.type = con.type;
                                         Table.Insert(constant); .)
+										  
+    
   .
 
-  Constant<out ConstRec con,out bool exp>         (. con = new ConstRec(); 
-													 exp = false;.)
+
+  Constant<out ConstRec con>         (. con = new ConstRec(); .)
   =   IntConst<out con.value>        (. con.type = Types.intType; .)
     | CharConst<out con.value>       (. con.type = Types.charType; .)
     | "true"                         (. con.type = Types.boolType; 
@@ -233,12 +232,11 @@ PRODUCTIONS
 						                con.value = 0; .)
     | "null"                         (. con.type = Types.nullType;
 						                con.value = 0; .)
-	| Expression<out con.type>       (. exp = true; .)
   .
 
-  VarDeclarations<StackFrame frame>          (. int type; .)
-  =  Type<out type>
-     VarList<frame, type>
+  VarDeclarations<StackFrame frame>          (. int type; bool final=false; .)
+  =  ["final" (. final=true; .)]Type<out type>
+     VarList<frame, type,final>
      WEAK ";"
   .
 
@@ -255,14 +253,15 @@ PRODUCTIONS
   .
 
 
-  VarList<StackFrame frame, int type>
-  =  OneVar<frame, type>
-     { WEAK "," OneVar<frame, type> }
+  VarList<StackFrame frame, int type,bool final>
+  =  OneVar<frame, type,final>
+     { WEAK "," OneVar<frame, type,final> }
   .
 
-  OneVar<StackFrame frame, int type>    (. int expType;
+  OneVar<StackFrame frame, int type,bool final>    (. int expType;
                                            Entry var = new Entry(); .)
-  =  Ident<out var.name>                (. var.kind = Kinds.Var;
+  =  Ident<out var.name>                (. if(!final) var.kind = Kinds.Var;
+										   else var.kind = Kinds.Fin; //Kind.Fin value should be able to be changed
                                            var.type = type;
                                            var.offset = frame.size;
                                            frame.size++; .)
@@ -289,8 +288,9 @@ PRODUCTIONS
 		 ] 
 	     
 	                                      
-	   |  Designator<out des>                       (. if(des.entry.kind != Kinds.Var) 
-														SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]); .)
+	   |  Designator<out des>                       (. if(des.entry.kind != Kinds.Var && ( IsArray(des.entry.type) && IsArray(des.type))) 
+														SemError("cannot assign to " + Kinds.kindNames[des.entry.kind]); 
+														.)
         ( AssignOp (Expression<out expType>        (. if(!Assignable(des.type,expType)) SemError("incompatible types in assignment");
                                                      CodeGen.Assign(des.type); 
 										   
@@ -333,10 +333,10 @@ PRODUCTIONS
   Ident<out name>                    (. Entry entry = Table.Find(name);
                                            if (!entry.declared) SemError("undeclared identifier");
                                            des = new DesType(entry);
-                                           if (entry.kind == Kinds.Var) CodeGen.LoadAddress(entry); .)
+                                           if (entry.kind == Kinds.Var || entry.kind==Kinds.Fin) CodeGen.LoadAddress(entry); .)
      [  "["              	            (. if (IsArray(des.type)) des.type--;
                         		           else SemError("unexpected subscript");
-                                           if (des.entry.kind != Kinds.Var) SemError("unexpected subscript"); 
+                                           if (des.entry.kind != Kinds.Var && des.entry.kind != Kinds.Fin) SemError("unexpected subscript "); 
                                            CodeGen.Dereference(); 
 										   
 										   .)
@@ -614,7 +614,8 @@ PRODUCTIONS
                                    ConstRec con; .)
   =    Designator<out des>      (. type = des.type;
                                    switch (des.entry.kind) {
-                                    case Kinds.Var:
+                                    case Kinds.Var: 
+									case Kinds.Fin:
                                         CodeGen.Dereference();
                                         break;
                                     case Kinds.Con:
