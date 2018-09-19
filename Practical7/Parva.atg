@@ -467,18 +467,25 @@ PRODUCTIONS
   = (WriteElement { WEAK "," WriteElement }) 
   .
 
-  WriteElement                  (. int expType; string str;.)
-  =   StringConst<out str>      (. CodeGen.WriteString(str);.)
-    | Expression<out expType>   (. if (!(IsArith(expType) ||
+  WriteElement                  (. int expType, expType_2= Types.noType; string str;.)
+  =   (StringConst<out str>      (. CodeGen.WriteString(str);.)
+    | Expression<out expType> [":" Expression<out expType_2> ] 
+								 (. if (!(IsArith(expType) ||
 						          expType == Types.boolType))
                                   SemError("cannot write this type ");
                                   switch (expType) {
                                       case Types.intType:
                                       case Types.boolType:
                                       case Types.charType:
+									  if(expType_2==Types.noType)
                                           CodeGen.Write(expType);
+									  else {
+									   if(expType_2!= Types.intType) SemError("Width should be integer"); 
+										 CodeGen.WritePadding(expType);
+									   }
 							              break;
                                       default: break; } .)
+	   )
   .
 
   Condition                       (. int type; .)

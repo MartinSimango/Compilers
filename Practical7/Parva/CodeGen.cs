@@ -372,6 +372,14 @@ namespace Parva {
 	public static void MaxMin(string mnemonic, int amount){
 		if(amount != 1) for(int i = 0; i < amount - 1; i++) Emit(PVM.OpCode(mnemonic));
 	}
+	public static void WritePadding(int type) {
+    // Generates code to output value of specified type from top of stack
+      switch (type) {
+        case Types.intType:  Emit(PVM.wprni); break;
+        case Types.boolType: Emit(PVM.wprnb); break;
+        case Types.charType: Emit(PVM.wprnc); break;
+      }
+    } // CodeGen.Write
 	
 	
   } // end CodeGen

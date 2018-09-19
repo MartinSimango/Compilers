@@ -110,6 +110,9 @@ namespace Parva {
 	  sqr     =  80,
 	  aceq    =  81, //check if array's are equal;
 	  acpy    =  82, //copy array
+	  wprni   =  83,
+	  wprnb   =  84,
+	  wprnc   =  85,
       nul     = 255;                         // leave gap for future
 
     public static string[] mnemonics = new string[PVM.nul + 1];
@@ -686,6 +689,24 @@ namespace Parva {
 				}
 				*/
 			break;
+			case PVM.wprni:          // integer output with wdith
+				if (tracing) results.Write(padding);
+				tos=Pop();
+				results.Write(Pop(),tos);
+				if (tracing) results.WriteLine();
+            break;
+          case PVM.wprnb:          // boolean output with width
+            if (tracing) results.Write(padding);
+			tos = Pop();
+            if (Pop() != 0) results.Write("true",tos); else results.Write("false",tos);
+            if (tracing) results.WriteLine();
+            break;
+          case PVM.wprnc:          // character output with width
+            if (tracing) results.Write(padding);
+			tos = Pop();
+            results.Write((char) (Math.Abs(Pop()) % (maxChar + 1)), tos);
+            if (tracing) results.WriteLine();
+			break;
           default:                // unrecognized opcode
             ps = badOp;
             break;
@@ -900,6 +921,9 @@ namespace Parva {
 	  mnemonics[PVM.sqr]      = "SQR";
 	  mnemonics[PVM.aceq]     = "ACEQ";
 	  mnemonics[PVM.acpy]     = "ACPY";
+	  mnemonics[PVM.wprni]    = "WPRNI";
+	  mnemonics[PVM.wprnb]    = "WPRNB";
+	  mnemonics[PVM.wprnc]    = "WPRNC";
  	  } // PVM.Init
 
   } // end PVM
