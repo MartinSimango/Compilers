@@ -394,37 +394,53 @@ PRODUCTIONS
 
   BreakStatement<Label loopExit>
   = "break" WEAK ";" (. 
-						if(loopExit==null) SemError("Cannot use 'break' out of loop");
+						if(loopExit==null) SemError("Invalid use of break statement");
 						else CodeGen.Branch(loopExit); 
 						
 						.)
   .
   
-  SwitchStatement<StackFrame frame>       (. int expType; .)
-  = "switch"
-    "(" Expression<out expType>
+  SwitchStatement<StackFrame frame>       (. int expType; List<string> caseList = new List<string>();.)
+  = "switch"                              (. Label switchExit = new Label(!known); 
+												.)
+    "(" Expression<out expType>           (. if(!IsArith(expType) && !IsBool(expType)) SemError("Expression in switch should be an int"); .)
     ")" "{"
-      { CaseLabelList
-        Statement<frame>
-        { Statement<frame>
-        } }
+       {										     (. Label statementStart = new Label(!known); 
+											              Label nextCase = new Label(!known); .)  
+	    CaseLabelList<expType, caseList,statementStart,nextCase>    (. statementStart.Here(); .)
+        Statement<frame,switchExit>        
+        { Statement<frame,switchExit>
+        } (. CodeGen.Branch(switchExit); nextCase.Here(); .)
+		}                                   
       [ "default" ":"
-        { Statement<frame>
+        { Statement<frame,switchExit>
         } ]
-    "}"
+    "}"                                    (. switchExit.Here(); .)
   .
 
-  CaseLabelList
-  = CaseLabel { CaseLabel }
+  CaseLabelList<. int expType,List<string> caseList , Label statementStart, Label nextCase .> 
+  = (. CodeGen.OneWord("DUP"); .)CaseLabel<expType, caseList>(. CodeGen.BranchFalse(statementStart); .) 
+  { (. CodeGen.OneWord("DUP"); .) CaseLabel<expType,caseList>  (. CodeGen.BranchFalse(statementStart); .) } (. CodeGen.Branch(nextCase); .)
+   //comparte with top again if there was no branch
   .
 
-  CaseLabel                              	(. ConstRec con; .)
-  = "case" [ "+" | "-" ]
-    Constant<out con>
+  CaseLabel<.int expType, List<string> caseList .>                  (. ConstRec con; 
+																	    int neg=1; 
+																	    bool plusMinus=false; 
+																		.)
+  = "case" [ ("+" | "-" (. neg=-1; .) ) (. plusMinus = true;.) ]                               
+    Constant<out con>			            (.  if(plusMinus && con.type != Types.intType) SemError("+/- is to be used only with ints");
+												if( con.type != expType) SemError("Switch expression type must must case types");
+									             if(con.type==Types.intType) con.value*=neg;
+												 if(caseList.Contains(con.value+"")) SemError("repeated case label: "+ con.value);
+												 caseList.Add(con.value+"");
+												 CodeGen.LoadConstant(con.value*neg);
+                                                 CodeGen.OneWord("CNE");
+												.)	
     ":"
   .
 
-  HaltStatement
+  HaltStatement												    
   =  "halt" "(" [WriteList] ")"             (. CodeGen.WriteLine(); CodeGen.LeaveProgram(); .)
      WEAK ";"
   .
